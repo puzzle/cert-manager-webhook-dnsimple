@@ -2,6 +2,22 @@ apiVersion: v1
 entries:
   cert-manager-webhook-dnsimple:
   - apiVersion: v1
+    appVersion: 0.1.2
+    created: "2023-08-24T14:26:23.618651421+02:00"
+    description: cert-manager webhook solver for ACME DNS01 challenge via DNSimple
+    digest: b0118f43c57d8c22235615c9d0f8950ff5afaa9fcf7cd34df91bc37ced218b47
+    home: https://github.com/neoskop/cert-manager-webhook-dnsimple
+    maintainers:
+    - email: diekmann@neoskop.de
+      name: Arne Diekmann
+      url: https://www.neoskop.de
+    name: cert-manager-webhook-dnsimple
+    sources:
+    - https://github.com/neoskop/cert-manager-webhook-dnsimple
+    urls:
+    - https://github.com/neoskop/cert-manager-webhook-dnsimple/releases/download/cert-manager-webhook-dnsimple-0.1.2/cert-manager-webhook-dnsimple-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v1
     appVersion: 0.1.1
     created: "2021-12-20T17:59:00.556708533+01:00"
     description: cert-manager webhook solver for ACME DNS01 challenge via DNSimple
