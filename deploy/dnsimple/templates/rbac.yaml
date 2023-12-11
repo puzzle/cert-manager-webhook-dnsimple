@@ -3,6 +3,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: {{ include "dnsimple-webhook.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     app: {{ include "dnsimple-webhook.name" . }}
     chart: {{ include "dnsimple-webhook.chart" . }}
