@@ -22,6 +22,7 @@ import (
 )
 
 var GroupName = os.Getenv("GROUP_NAME")
+var DnsimpleAccountId = os.Getenv("DNSIMPLE_ACCOUNT_ID")
 
 func main() {
 	if GroupName == "" {
@@ -179,7 +180,11 @@ func Whoami(client *dnsimple.Client) (string, error) {
 		return "", err
 	}
 
-	return strconv.FormatInt(whoamiResponse.Data.Account.ID, 10), nil
+	if GroupName != "" {
+		return strconv.FormatInt(whoamiResponse.Data.Account.ID, 10), nil
+	} else {
+		return DnsimpleAccountId
+	}
 }
 
 // Present is responsible for actually presenting the DNS record with the
