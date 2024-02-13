@@ -180,7 +180,7 @@ func Whoami(client *dnsimple.Client) (string, error) {
 		return "", err
 	}
 
-	if DnsimpleAccountId != "" {
+	if DnsimpleAccountId == "" {
 		return strconv.FormatInt(whoamiResponse.Data.Account.ID, 10), nil
 	} else {
 		return DnsimpleAccountId, nil
