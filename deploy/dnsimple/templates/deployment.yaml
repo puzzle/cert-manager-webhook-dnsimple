@@ -41,7 +41,6 @@ spec:
           env:
             - name: GROUP_NAME
               value: {{ .Values.groupName | quote }}
-          env:
             - name: DNSIMPLE_ACCOUNT_ID
               value: {{ .Values.dnsimple.accountID | quote }}
           ports:
