@@ -120,14 +120,9 @@ func (c *dnsimpleDNSProviderSolver) getDomainAndEntry(ch *v1alpha1.ChallengeRequ
 }
 
 func (c *dnsimpleDNSProviderSolver) getExistingRecord(cfg *dnsimpleDNSProviderConfig, client *dnsimple.Client, accountID string, zoneName string, entry string, key string) (*dnsimple.ZoneRecord, error) {
-	zone, err := client.Zones.GetZone(context.Background(), accountID, zoneName)
-
-	if err != nil {
-		return nil, fmt.Errorf("unable to get zone: %s", err)
-	}
 
 	// Look for existing TXT records.
-	records, err := client.Zones.ListRecords(context.Background(), accountID, zone.Data.Name, &dnsimple.ZoneRecordListOptions{Type: dnsimple.String("TXT"), Name: dnsimple.String(entry)})
+	records, err := client.Zones.ListRecords(context.Background(), accountID, zoneName, &dnsimple.ZoneRecordListOptions{Type: dnsimple.String("TXT"), Name: dnsimple.String(entry)})
 
 	if err != nil {
 		return nil, fmt.Errorf("unable to get resource records: %s", err)
