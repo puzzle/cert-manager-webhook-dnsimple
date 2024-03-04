@@ -1,7 +1,7 @@
 name: Build Docker Images
 
 env:
-  IMAGE_NAME: cert-manager-webhook-dnsimple
+  IMAGE_NAME: cert-manager-webhook-dnsimpl
 
 on:
   push:
@@ -36,5 +36,5 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:${{ github.sha }}
-            ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:latest
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
