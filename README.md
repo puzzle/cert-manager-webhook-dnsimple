@@ -10,40 +10,39 @@ A [cert-manager][2] ACME DNS01 solver webhook for [DNSimple][1].
 
 ## Quickstart
 
-Take note of your DNSimple API token from the account settings in the automation tab. Run the following commands replacing the API token placeholders and email address:
+1. Take note of your DNSimple API token from the account settings in the automation tab. 
+2. Run the following commands replacing the API token placeholders and email address:
+  ```bash
+  $ helm repo add neoskop https://charts.neoskop.dev
+  $ helm install cert-manager-webhook-dnsimple \
+      --namespace cert-manager \
+      --dry-run \
+      --set dnsimple.token='<DNSIMPLE_API_TOKEN>' \
+      --set clusterIssuer.production.enabled=true \
+      --set clusterIssuer.staging.enabled=true \
+      --set clusterIssuer.email=email@example.com \
+      neoskop/cert-manager-webhook-dnsimple
+  ```
+  (Alternatively you can check out this repository and substitute the source of the install command with `./deploy/dnsimple`.)
 
-```bash
-$ helm repo add neoskop https://charts.neoskop.dev
-$ helm install cert-manager-webhook-dnsimple \
-    --namespace cert-manager \
-    --dry-run \
-    --set dnsimple.token='<DNSIMPLE_API_TOKEN>' \
-    --set clusterIssuer.production.enabled=true \
-    --set clusterIssuer.staging.enabled=true \
-    --set clusterIssuer.email=email@example.com \
-    neoskop/cert-manager-webhook-dnsimple
-```
+3. Afterwards issue a certificate:
 
-_(Alternatively you can check out this repository and substitute neoskop/cert-manager-webhook-dnsimple with ./deploy/dnsimple)_
-
-Afterwards issue a certificate:
-
-```bash
-$ cat << EOF | kubectl apply -f -
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: dnsimple-test
-  namespace: default
-spec:
-  dnsNames:
-    - test.example.com
-  issuerRef:
-    name: cert-manager-webhook-dnsimple-production
-    kind: ClusterIssuer
-  secretName: dnsimple-test-tls
-EOF
-```
+  ```bash
+  $ cat << EOF | kubectl apply -f -
+  apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: dnsimple-test
+    namespace: default
+  spec:
+    dnsNames:
+      - test.example.com
+    issuerRef:
+      name: cert-manager-webhook-dnsimple-production
+      kind: ClusterIssuer
+    secretName: dnsimple-test-tls
+  EOF
+  ```
 
 ## Options
 
