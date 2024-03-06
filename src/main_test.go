@@ -19,7 +19,7 @@ func TestRunsSuite(t *testing.T) {
 	fixture := dns.NewFixture(&dnsimpleDNSProviderSolver{},
 		dns.SetResolvedZone(zone),
 		dns.SetAllowAmbientCredentials(false),
-		dns.SetManifestPath("testdata/dnsimple"),
+		dns.SetManifestPath("../testdata/dnsimple"),
 	)
 
 	fixture.RunConformance(t)

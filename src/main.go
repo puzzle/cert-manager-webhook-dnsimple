@@ -106,6 +106,10 @@ func (c *dnsimpleDNSProviderSolver) getClient(cfg *dnsimpleDNSProviderConfig, na
 
 	// new client
 	client := dnsimple.NewClient(tc)
+	if os.Getenv("DNSIMPLE_SANDBOX") == "true" {
+		client.BaseURL = "https://api.sandbox.dnsimple.com"
+		klog.V(4).Info("Using DNSimple sandbox as the base URL for api calls.")
+	}
 	client.SetUserAgent("cert-manager-webhook-dnsimple")
 	return client, nil
 }
