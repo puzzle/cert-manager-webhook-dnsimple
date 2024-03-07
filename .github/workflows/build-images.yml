@@ -2,7 +2,7 @@ name: Build Docker Images
 
 env:
   IMAGE_NAME: cert-manager-webhook-dnsimple
-  DOCKER_BASE_NAME: ghcr.io/${{ github.repository_owner }}/${{ github.repository_name }}
+  DOCKER_BASE_NAME: ghcr.io/${{ github.repository_owner }}
 
 on:
   push:
