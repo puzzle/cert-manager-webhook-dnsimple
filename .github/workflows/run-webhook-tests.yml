@@ -1,0 +1,55 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup KinD cluster
+      uses: engineerd/setup-kind@v0.5.0
+
+    - name: Install cert-manager
+      run: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.3/cert-manager.yaml
+
+    - name: Install cert-manager-webhook-dnsimple
+      run: |
+        helm repo add testing https://puzzle.github.io/cert-manager-webhook-dnsimple
+        helm install cert-manager-webhook-dnsimple testing/cert-manager-webhook-dnsimple
+            --set dnsimple.apiToken=${{ secrets.DNSIMPLE_API_TOKEN }}
+            --set dnsimple.baseURL=https://api.dnsimple.com/v2
+            --set image.tag=${{ github.sha}}
+
+    - name: Create sample ingress that uses cert-manager
+      run: |
+        kubectl apply -f - <<EOF
+        apiVersion: networking.k8s.io/v1
+        kind: Ingress
+        metadata:
+            name: sample-ingress
+        spec:
+            tls:
+            - hosts:
+                - test.puzzzzle.ch
+            secretName: your-domain-com-tls
+            rules:
+            - host: test.puzzzzle.ch
+            http:
+                paths:
+                - path: /
+                pathType: Prefix
+                backend:
+                    service:
+                    name: your-service
+                    port:
+                        number: 80
+
+    - name: Check DNSimple API for new TXT record
+      run: |
+        curl -H 'Authorization: Bearer ${{ secrets.DNSIMPLE_API_TOKEN }}' \
+        -H 'Accept: application/json' \
+        -X GET https://api.sandbox.dnsimple.com/v2/2250/zones/test.puzzzzle.ch/records?type=TXT

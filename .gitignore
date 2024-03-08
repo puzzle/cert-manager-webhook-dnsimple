@@ -13,3 +13,4 @@
 
 # Ignore test binaries
 __test__/
+_test/
