@@ -5,6 +5,9 @@ name: Release Charts
 
 on:
   push:
+    branches:
+      - master
+# todo: only when a tag is pushed
 
 jobs:
   release:
