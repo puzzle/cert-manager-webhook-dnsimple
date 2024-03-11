@@ -40,7 +40,7 @@ jobs:
         data:
             token: $(echo -n '${{ secrets.DNSIMPLE_API_TOKEN }}' | base64)
         """ > testdata/dnsimple/dnsimple-token.yaml
-        ls /testdata/dnsimple
-        cat /testdata/dnsimple/dnsimple-token.yaml
+        ls testdata/dnsimple
+        cat testdata/dnsimple/dnsimple-token.yaml
         cd src
         go test -v .
