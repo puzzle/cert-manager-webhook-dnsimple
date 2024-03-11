@@ -35,4 +35,15 @@ jobs:
         export TEST_ASSET_KUBE_APISERVER=${{ env.KUBEBUILDER_BIN_DIR }}/kube-apiserver
         export TEST_ASSET_ETCD=${{ env.KUBEBUILDER_BIN_DIR }}/etcd
         export TEST_ASSET_KUBECTL=${{ env.KUBEBUILDER_BIN_DIR }}/kubectl
+        export TEST_ZONE_NAME=puzzzzle.ch.
+        export DNSIMPLE_SANDBOX=true
+        mkdir -p testdata/dnsimple
+        echo """apiVersion: v1
+        kind: Secret
+        metadata:
+          name: dnsimple-token
+        type: Opaque
+        data:
+            token: $(echo -n '${{ secrets.DNSIMPLE_API_TOKEN }}' | base64)
+        """ > testdata/dnsimple/secret.yaml
         go test -v .

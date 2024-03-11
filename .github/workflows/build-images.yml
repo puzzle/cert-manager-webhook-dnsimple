@@ -1,4 +1,4 @@
-name: Build Docker Images
+name: Build docker images
 
 env:
   IMAGE_NAME: cert-manager-webhook-dnsimple
