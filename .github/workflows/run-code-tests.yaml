@@ -22,11 +22,8 @@ jobs:
       with:
         go-version: '1.21.x'
   
-    - name: Change directory
-      run: cd src
-
     - name: Install dependencies
-      run: go get .
+      run: go get src
 
     - name: Run tests
-      run: go test -v .
+      run: go test -v src
