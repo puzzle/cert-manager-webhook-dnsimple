@@ -23,13 +23,16 @@ jobs:
         go-version: '1.21.x'
     
     - name: Install kubebuilder fixtures
+      id: kubebuilder
       run: |
         go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
-        setup-envtest use
+        echo "KUBEBUILDER_BIN_DIR=$(setup-envtest use -p path)" >> $GITHUB_ENV
 
     - name: Run tests
       run: |
         ls
         cd src
-        export KUBEBUILDER_ASSETS=../bin
+        export TEST_ASSET_KUBE_APISERVER=${{ env.KUBEBUILDER_BIN_DIR }}/kube-apiserver
+        export TEST_ASSET_ETCD=${{ env.KUBEBUILDER_BIN_DIR }}/etcd
+        export TEST_ASSET_KUBECTL=${{ env.KUBEBUILDER_BIN_DIR }}/kubectl
         go test -v .
