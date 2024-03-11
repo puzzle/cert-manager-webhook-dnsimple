@@ -1,12 +1,8 @@
 name: Run webhook tests
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+  workflow_call:
+
 
 jobs:
   test:

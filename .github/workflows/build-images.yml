@@ -5,13 +5,9 @@ env:
   DOCKER_BASE_NAME: ghcr.io/${{ github.repository_owner }}
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-
+  workflow_call:
+  
+  
 jobs:
   build:
     runs-on: ubuntu-latest

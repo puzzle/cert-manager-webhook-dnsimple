@@ -2,11 +2,7 @@ name: Run code tests
 
 on:
   push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+  workflow_call:
 
 
 jobs:
@@ -45,5 +41,5 @@ jobs:
         type: Opaque
         data:
             token: $(echo -n '${{ secrets.DNSIMPLE_API_TOKEN }}' | base64)
-        """ > testdata/dnsimple/secret.yaml
+        """ > testdata/dnsimple/dnsimple-token.yaml
         go test -v .
