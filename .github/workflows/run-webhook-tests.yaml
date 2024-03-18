@@ -26,7 +26,8 @@ jobs:
             --set dnsimple.apiToken=${{ secrets.DNSIMPLE_API_TOKEN }}
             --set dnsimple.baseURL=https://api.dnsimple.com/v2
             --set image.repository=ghcr.io/moll-re/cert-manager-webhook-dnsimple
-            --set image.tag=${{ github.sha}}
+            --set image.tag=latest
+        # --set image.tag=${{ github.sha}}
 
     - name: Create sample ingress that uses cert-manager
       run: |
