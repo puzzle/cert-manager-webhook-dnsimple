@@ -60,8 +60,13 @@ jobs:
                         number: 80
 
     - name: Check DNSimple API for new TXT record
+      env:
+        DNSIMPLE_API_TOKEN: ${{ secrets.DNSIMPLE_API_TOKEN }}
       run: |
         curl \
-          -H 'Authorization: Bearer ${{ secrets.DNSIMPLE_API_TOKEN }}' \
+          -H 'Authorization: Bearer $DNSIMPLE_API_TOKEN' \
           -H 'Accept: application/json' \
-          -X GET https://api.sandbox.dnsimple.com/v2/2250/zones/test.puzzzzle.ch/records?type=TXT
+          -X GET https://api.sandbox.dnsimple.com/v2/2250/zones/test.puzzzzle.ch/records?type=TXT \
+          -o records.json
+        cat records.json
+        echo "$(jq '.data[].content' records.json)"
