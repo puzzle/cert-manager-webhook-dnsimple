@@ -9,8 +9,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Setup KinD cluster
-      uses: engineerd/setup-kind@v0.5.0
+    - uses: actions/checkout@v4
+
+    - name: Start minikube
+      uses: medyagh/setup-minikube@master
+
+    - name: Try the cluster
+      run: kubectl get pods -A
 
     - name: Install cert-manager
       run: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.3/cert-manager.yaml
