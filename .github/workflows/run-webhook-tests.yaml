@@ -52,12 +52,12 @@ jobs:
               http:
                 paths:
                 - path: /
-                pathType: Prefix
-                backend:
-                  service:
-                  name: your-service
-                  port:
-                    number: 80
+                  pathType: Prefix
+                  backend:
+                    service:
+                    name: your-service
+                    port:
+                      number: 80
 
     - name: Check DNSimple API for new TXT record
       run: |
