@@ -26,9 +26,11 @@ jobs:
         kubectl get svc -n cert-manager -o wide
 
     - name: Install cert-manager-webhook-dnsimple
+      env:
+        API_TOKEN: ${{ secrets.DNSIMPLE_API_TOKEN }}
       run: |
         helm install cert-manager-webhook-dnsimple ./charts/cert-manager-webhook-dnsimple \
-          --set dnsimple.token="why is this not working?" \
+          --set dnsimple.token="$API_TOKEN" \
           --set dnsimple.apiBaseURL=https://api.sandbox.dnsimple.com \
           --set image.repository=ghcr.io/moll-re/cert-manager-webhook-dnsimple \
           --set image.tag=latest
@@ -40,26 +42,26 @@ jobs:
         apiVersion: networking.k8s.io/v1
         kind: Ingress
         metadata:
-            name: sample-ingress
+          name: sample-ingress
         spec:
-            tls:
+          tls:
             - hosts:
-                - test.puzzzzle.ch
-            secretName: your-domain-com-tls
-            rules:
+              - test.puzzzzle.ch
+          rules:
             - host: test.puzzzzle.ch
-            http:
+              http:
                 paths:
                 - path: /
                 pathType: Prefix
                 backend:
-                    service:
-                    name: your-service
-                    port:
-                        number: 80
+                  service:
+                  name: your-service
+                  port:
+                    number: 80
 
     - name: Check DNSimple API for new TXT record
       run: |
-        curl -H 'Authorization: Bearer ${{ secrets.DNSIMPLE_API_TOKEN }}' \
-        -H 'Accept: application/json' \
-        -X GET https://api.sandbox.dnsimple.com/v2/2250/zones/test.puzzzzle.ch/records?type=TXT
+        curl \
+          -H 'Authorization: Bearer ${{ secrets.DNSIMPLE_API_TOKEN }}' \
+          -H 'Accept: application/json' \
+          -X GET https://api.sandbox.dnsimple.com/v2/2250/zones/test.puzzzzle.ch/records?type=TXT
