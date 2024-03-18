@@ -37,5 +37,16 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ env.DOCKER_BASE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.DOCKER_BASE_NAME }}/${{ env.IMAGE_NAME }}:commit-${{ github.sha }}
             ${{ env.DOCKER_BASE_NAME }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Delete old images matching the pattern commit-*
+        uses: snok/container-retention-policy@v2
+        with:
+          image-names: ${{ env.DOCKER_BASE_NAME }}/${{ env.IMAGE_NAME }}
+          filter-tags: commit-
+          cut-off: One month ago UTC
+          keep-at-least: 1
+          account-type: personal
+          token: ${{ secrets.GITHUB_TOKEN }}
+          token-type: github-token

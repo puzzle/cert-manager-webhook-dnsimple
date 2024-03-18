@@ -33,7 +33,7 @@ jobs:
           --set dnsimple.token='$DNSIMPLE_API_TOKEN' \
           --set dnsimple.apiBaseURL=https://api.sandbox.dnsimple.com \
           --set image.repository=ghcr.io/moll-re/cert-manager-webhook-dnsimple \
-          -- set clusterIssuer.production.enabled=true \
+          --set clusterIssuer.production.enabled=true \
           --set clusterIssuer.email=email@example.com \
           --set image.tag=latest
       # --set image.tag=${{ github.sha}}
