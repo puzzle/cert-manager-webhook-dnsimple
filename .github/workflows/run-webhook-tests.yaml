@@ -22,10 +22,10 @@ jobs:
 
     - name: Install cert-manager-webhook-dnsimple
       run: |
-        helm repo add testing https://puzzle.github.io/cert-manager-webhook-dnsimple
-        helm install cert-manager-webhook-dnsimple testing/cert-manager-webhook-dnsimple
+        helm install cert-manager-webhook-dnsimple ./charts/cert-manager-webhook-dnsimple
             --set dnsimple.apiToken=${{ secrets.DNSIMPLE_API_TOKEN }}
             --set dnsimple.baseURL=https://api.dnsimple.com/v2
+            --set image.repository=ghcr.io/moll-re/cert-manager-webhook-dnsimple
             --set image.tag=${{ github.sha}}
 
     - name: Create sample ingress that uses cert-manager
