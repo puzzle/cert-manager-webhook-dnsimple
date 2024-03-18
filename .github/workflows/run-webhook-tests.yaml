@@ -27,10 +27,10 @@ jobs:
 
     - name: Install cert-manager-webhook-dnsimple
       env:
-        API_TOKEN: ${{ secrets.DNSIMPLE_API_TOKEN }}
+        DNSIMPLE_API_TOKEN: ${{ secrets.DNSIMPLE_API_TOKEN }}
       run: |
         helm install cert-manager-webhook-dnsimple ./charts/cert-manager-webhook-dnsimple \
-          --set dnsimple.token='${{ secrets.DNSIMPLE_API_TOKEN }}' \
+          --set dnsimple.token='$DNSIMPLE_API_TOKEN' \
           --set dnsimple.apiBaseURL=https://api.sandbox.dnsimple.com \
           --set image.repository=ghcr.io/moll-re/cert-manager-webhook-dnsimple \
           --set image.tag=latest
