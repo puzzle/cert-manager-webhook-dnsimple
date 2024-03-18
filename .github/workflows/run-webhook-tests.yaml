@@ -13,12 +13,17 @@ jobs:
 
     - name: Start minikube
       uses: medyagh/setup-minikube@master
-
-    - name: Try the cluster
-      run: kubectl get pods -A
+      with:
+        kubernetes-version: 1.21.2
 
     - name: Install cert-manager
       run: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.3/cert-manager.yaml
+
+    - name: Wait for cert-manager to be ready
+      run: |
+        kubectl wait --for=condition=available --timeout=600s deployment/cert-manager-webhook -n cert-manager
+        kubectl get pods -n cert-manager
+        kubectl get svc -n cert-manager -o wide
 
     - name: Install cert-manager-webhook-dnsimple
       run: |
