@@ -5,7 +5,7 @@ on:
     branches:
     - master
   pull_request_target:
-    types: [assigned]
+    branches: [master, main]
     # using pull_request_target allows for running tests to access the repo's secrets
 
 jobs:
