@@ -13,6 +13,7 @@ certManager:
 # logLevel: 3
 dnsimple:
   token: ""
+  apiBaseURL: "https://api.dnsimple.com"
   # existingTokenSecret: false
   # tokenSecretName:
 clusterIssuer:

@@ -13,12 +13,12 @@ jobs:
   #   name: Run tests on code
   #   uses: ./.github/workflows/run-code-tests.yaml
   
-  # build-image:
-  #   name: Build Docker image
-  #   uses: ./.github/workflows/build-docker-image.yaml
-  #   needs: code-test
+  build-image:
+    name: Build Docker image
+    uses: ./.github/workflows/build-docker-image.yaml
+    # needs: code-test
   
   webhook-tests:
     name: Run tests on webhooks
     uses: ./.github/workflows/run-webhook-tests.yaml
-    # needs: build-image
+    needs: build-image
