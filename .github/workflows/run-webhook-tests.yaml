@@ -35,6 +35,7 @@ jobs:
         helm install cert-manager-webhook-dnsimple ./charts/cert-manager-webhook-dnsimple \
           --set dnsimple.token='$DNSIMPLE_API_TOKEN' \
           --set dnsimple.apiBaseURL=https://api.sandbox.dnsimple.com \
+          --set groupName=acme.puzzzzle.ch \
           --set image.repository=ghcr.io/moll-re/cert-manager-webhook-dnsimple \
           --set clusterIssuer.production.enabled=true \
           --set clusterIssuer.email=test@puzzle.ch \
