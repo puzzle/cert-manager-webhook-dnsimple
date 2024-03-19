@@ -4,9 +4,10 @@ on:
   push:
     branches:
     - master
-  pull_request_target:
-    # using pull_request_target allows for running tests to access the repo's secrets
-
+  pull_request:
+    branches:
+    - master
+  
 jobs:
   # code-test:
   #   name: Run tests on code

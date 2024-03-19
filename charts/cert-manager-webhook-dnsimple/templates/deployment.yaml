@@ -42,7 +42,7 @@ spec:
             - name: GROUP_NAME
               value: {{ .Values.groupName | quote }}
             - name: API_BASE_URL
-              value: {{ .Values.dnsimple.apiBaseUrl | quote }}
+              value: {{ .Values.dnsimple.apiBaseURL | quote }}
           ports:
             - name: https
               containerPort: 443
