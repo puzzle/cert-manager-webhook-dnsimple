@@ -106,7 +106,7 @@ func (c *dnsimpleDNSProviderSolver) getClient(cfg *dnsimpleDNSProviderConfig, na
 
 	// new client
 	client := dnsimple.NewClient(tc)
-	client.BaseURL = os.Getenv("DNSIMPLE_BASE_URL")
+	client.BaseURL = os.Getenv("API_BASE_URL")
 	klog.V(4).Infof("Using sandbox API endpoint: %s", client.BaseURL)
 	client.SetUserAgent("cert-manager-webhook-dnsimple")
 	return client, nil

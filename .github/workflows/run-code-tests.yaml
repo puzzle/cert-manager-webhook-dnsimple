@@ -17,12 +17,15 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.21.x'
-    
+        cache-dependency-path: src/go.mod
+
+
     - name: Install kubebuilder fixtures
       id: kubebuilder
       run: |
         go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
         echo "KUBEBUILDER_BIN_DIR=$(setup-envtest use -p path)" >> $GITHUB_ENV
+
 
     - name: Run tests
       run: |
