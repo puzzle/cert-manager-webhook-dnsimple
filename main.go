@@ -22,7 +22,6 @@ import (
 )
 
 var GroupName = os.Getenv("GROUP_NAME")
-var DnsimpleAccountId = os.Getenv("DNSIMPLE_ACCOUNT_ID")
 
 func main() {
 	if GroupName == "" {
