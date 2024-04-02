@@ -13,7 +13,7 @@ certManager:
 # logLevel: 3
 dnsimple:
   token: ""
-  accountID: ""
+  # accountID:
   # existingTokenSecret: false
   # tokenSecretName:
 clusterIssuer:
