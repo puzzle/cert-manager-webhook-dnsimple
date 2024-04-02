@@ -41,8 +41,6 @@ spec:
           env:
             - name: GROUP_NAME
               value: {{ .Values.groupName | quote }}
-            - name: DNSIMPLE_ACCOUNT_ID
-              value: {{ .Values.dnsimple.accountID | quote }}
           ports:
             - name: https
               containerPort: 443
