@@ -10,9 +10,9 @@ on:
 jobs:
   docker-build:
     name: Build tagged Docker image
-    uses: ./.github/actions/build-images.yaml
+    uses: ./.github/workflows/build-images.yaml
 
   webhook-tests:
     name: Release new helm chart version
-    uses: ./.github/actions/chart-release.yaml
+    uses: ./.github/workflows/chart-release.yaml
     needs: docker-build
