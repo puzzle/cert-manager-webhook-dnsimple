@@ -88,13 +88,28 @@ You can also run tests locally, as specified in the `Makefile`:
     helm install cert-manager-webhook-dnsimple \
         --namespace cert-manager \
         --set dnsimple.token='<DNSIMPLE TOKEN>' \
-        --set clusterIssuer.production.enabled=true \
+        --set clusterIssuer.staging.enabled=true \
         ./charts/cert-manager-webhook-dnsimple
     ```
-
-
+3. Test away... You can create a sample certificate to ensure the webhook is working correctly:
+    ```bash
+    kubectl apply -f - <<<EOF
+    apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: dnsimple-test
+    spec:
+      dnsNames:
+        - test.example.com
+      issuerRef:
+        name: cert-manager-webhook-dnsimple-staging
+        kind: ClusterIssuer
+      secretName: dnsimple-test-tls
+    EOF
+    ```
+  
 ## Releases
-Every push to the `master` branch triggers the upload of a new docker image to the GitHub Container Registry. These images are considered stable but are not tagged as such. We recommend using a specific version tag for production deployments.
+Every push to the `master` branch triggers the upload of a new docker image to the GitHub Container Registry. These images are considered stable but are not tagged as such. **We recommend using a specific version tag for production deployments.**
 
 Tagged releases are also pushed to the GitHub Container Registry and are considered stable. Every tag also has its corresponding Helm chart (published [here][4]).
 

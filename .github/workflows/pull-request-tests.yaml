@@ -11,14 +11,14 @@ on:
 jobs:
   code-test:
     name: Run tests on code
-    uses: ./.github/workflows/run-code-tests.yaml
+    uses: ./.github/actions/run-code-tests.yaml
   
   build-image:
     name: Build Docker image
-    uses: ./.github/workflows/build-images.yaml
+    uses: ./.github/actions/build-images.yaml
     # needs: code-test
 
   webhook-tests:
     name: Run tests on webhooks
-    uses: ./.github/workflows/run-webhook-tests.yaml
+    uses: ./.github/actions/run-webhook-tests.yaml
     needs: build-image

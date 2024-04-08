@@ -29,7 +29,6 @@ jobs:
 
     - name: Run tests
       run: |
-        ls
         export TEST_ASSET_KUBE_APISERVER=${{ env.KUBEBUILDER_BIN_DIR }}/kube-apiserver
         export TEST_ASSET_ETCD=${{ env.KUBEBUILDER_BIN_DIR }}/etcd
         export TEST_ASSET_KUBECTL=${{ env.KUBEBUILDER_BIN_DIR }}/kubectl
@@ -42,6 +41,6 @@ jobs:
         type: Opaque
         data:
             token: $(echo -n '${{ secrets.DNSIMPLE_API_TOKEN }}' | base64)
-        """ > testdata/dnsimple/dnsimple-token.yaml
+        """ > testdata/dnsimple-token.yaml
         cd src
         go test -v .

@@ -4,16 +4,13 @@
 name: Release Charts
 
 on:
-  push:
-    branches:
-      - master
-    tags:
-      - '*'
+  workflow_call:
 
 jobs:
   release:
     permissions:
       contents: write
+  
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -31,4 +28,4 @@ jobs:
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
-          
+          chart_path: ./charts
