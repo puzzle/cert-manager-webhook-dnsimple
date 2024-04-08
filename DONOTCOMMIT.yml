@@ -1,0 +1,23 @@
+helm upgrade -i cert-manager-webhook-dnsimple ./charts/cert-manager-webhook-dnsimple \
+    -n cert-manager \
+    --set dnsimple.token='dnsimple_a_Q60PQjmeTZRVvotyprdWUrm6owqgR3pr' \
+    --set groupName=acme.moll.re \
+    --set image.repository=ghcr.io/moll-re/cert-manager-webhook-dnsimple \
+    --set clusterIssuer.staging.enabled=true \
+    --set clusterIssuer.email=me@moll.re \
+    --set image.tag=latest
+
+
+kubectl apply -f - <<EOF  
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: dnsimple-test
+spec:
+  dnsNames:
+    - hello.test.moll.re
+  issuerRef:
+    name: cert-manager-webhook-dnsimple-staging
+    kind: ClusterIssuer
+  secretName: dnsimple-test
+EOF
