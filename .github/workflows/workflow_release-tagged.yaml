@@ -11,6 +11,11 @@ jobs:
   docker-build:
     name: Build tagged Docker image
     uses: ./.github/workflows/build-images.yaml
+    with:
+      tags: |
+        ${{ github.ref }}
+        commit-${{ github.sha }}
+        latest
 
   webhook-tests:
     name: Release new helm chart version

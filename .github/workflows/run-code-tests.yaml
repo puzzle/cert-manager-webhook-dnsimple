@@ -24,14 +24,14 @@ jobs:
       id: kubebuilder
       run: |
         go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
-        echo "KUBEBUILDER_BIN_DIR=$(setup-envtest use -p path)" >> $GITHUB_ENV
+        echo "BIN_DIR=$(setup-envtest use -p path)" >> $GITHUB_OUTPUT
 
 
     - name: Run tests
       run: |
-        export TEST_ASSET_KUBE_APISERVER=${{ env.KUBEBUILDER_BIN_DIR }}/kube-apiserver
-        export TEST_ASSET_ETCD=${{ env.KUBEBUILDER_BIN_DIR }}/etcd
-        export TEST_ASSET_KUBECTL=${{ env.KUBEBUILDER_BIN_DIR }}/kubectl
+        export TEST_ASSET_KUBE_APISERVER=${{ steps.kubebuilder.outputs.BIN_DIR }}/kube-apiserver
+        export TEST_ASSET_ETCD=${{ steps.kubebuilder.outputs.BIN_DIR }}/etcd
+        export TEST_ASSET_KUBECTL=${{ steps.kubebuilder.outputs.BIN_DIR }}/kubectl
         export TEST_ZONE_NAME=puzzzzle.ch.
         export DNSIMPLE_SANDBOX=true
         echo """apiVersion: v1

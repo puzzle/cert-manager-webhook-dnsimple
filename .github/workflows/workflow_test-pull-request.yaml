@@ -16,9 +16,13 @@ jobs:
   build-image:
     name: Build Docker image
     uses: ./.github/workflows/build-images.yaml
+    with:
+      tags: |
+        commit-${{ github.sha }}
+        latest
     # needs: code-test
 
   webhook-tests:
     name: Run tests on webhooks
-    uses: ./.github/workflows/run-kubernetes-tests.yaml
     needs: build-image
+    uses: ./.github/workflows/run-kubernetes-tests.yaml

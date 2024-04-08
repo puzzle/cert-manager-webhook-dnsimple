@@ -1,11 +1,15 @@
 name: Build docker images
 
 env:
-  IMAGE_NAME: cert-manager-webhook-dnsimple
-  DOCKER_BASE_NAME: ghcr.io/${{ github.repository_owner }}
+  DOCKER_BASE_NAME: 'ghcr.io/${{ github.repository_owner }}/cert-manager-webhook-dnsimple'
 
 on:
   workflow_call:
+    inputs:
+      tags:
+        description: 'Multiline string of tags to build the image for'
+        required: true
+        type: string
 
 
 jobs:
@@ -29,6 +33,13 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           username: ${{ github.repository_owner }}
       
+      - name: Format tags
+        id: format-tags
+        # prepends the image name to each tag
+        run: |
+          TAGS=$(echo ${{ github.event.inputs.tags }} | awk '{print "${{ env.DOCKER_BASE_NAME }}:"$0}')
+          echo "TAGS=$TAGS" >> $GITHUB_OUTPUT
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -36,10 +47,8 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: |
-            ${{ env.DOCKER_BASE_NAME }}/${{ env.IMAGE_NAME }}:commit-${{ github.sha }}
-            ${{ env.DOCKER_BASE_NAME }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.DOCKER_BASE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.ref }}
+          tags: ${{ steps.format-tags.outputs.TAGS }}
+
 
 
       # currently not working
