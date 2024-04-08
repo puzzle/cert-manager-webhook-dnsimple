@@ -37,7 +37,7 @@ jobs:
         id: format-tags
         # prepends the image name to each tag
         run: |
-          TAGS=$(echo ${{ github.event.inputs.tags }} | awk '{print "${{ env.DOCKER_BASE_NAME }}:"$0}')
+          TAGS=$(echo ${{ inputs.tags }} | awk '{print "${{ env.DOCKER_BASE_NAME }}:"$0}')
           echo "TAGS=$TAGS" >> $GITHUB_OUTPUT
 
       - name: Build and push Docker image
