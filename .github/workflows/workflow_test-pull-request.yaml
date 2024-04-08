@@ -20,5 +20,5 @@ jobs:
 
   webhook-tests:
     name: Run tests on webhooks
-    uses: ./.github/workflows/run-webhook-tests.yaml
+    uses: ./.github/workflows/run-kubernetes-tests.yaml
     needs: build-image
