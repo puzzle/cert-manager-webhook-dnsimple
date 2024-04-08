@@ -1,4 +1,4 @@
-name: Run webhook tests
+name: Run webhook tests in a full environment
 
 on:
   workflow_call:
@@ -40,9 +40,8 @@ jobs:
           --set image.repository=ghcr.io/moll-re/cert-manager-webhook-dnsimple \
           --set clusterIssuer.staging.enabled=true \
           --set clusterIssuer.email=test@puzzle.ch \
-          --set image.tag=latest
+          --set image.tag=${{ github.sha}}
         kubectl get secrets cert-manager-webhook-dnsimple -o yaml
-      # --set image.tag=${{ github.sha}}
     - name: Wait for cert-manager-webhook-dnsimple to be ready
       run: |
         kubectl wait --for=condition=available --timeout=600s deployment/cert-manager-webhook-dnsimple
