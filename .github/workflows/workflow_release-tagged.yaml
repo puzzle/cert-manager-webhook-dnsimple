@@ -12,7 +12,7 @@ jobs:
     name: Build tagged Docker image
     uses: ./.github/workflows/build-images.yaml
     with:
-      tags: |
+      tags: >
         ${{ github.ref }}
         commit-${{ github.sha }}
         latest

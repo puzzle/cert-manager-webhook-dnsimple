@@ -7,7 +7,7 @@ on:
   workflow_call:
     inputs:
       tags:
-        description: 'Multiline string of tags to build the image for'
+        description: 'Tags to build the image for (separated by a whitespace)'
         required: true
         type: string
 
@@ -35,7 +35,7 @@ jobs:
       
       - name: Format tags
         id: format-tags
-        # prepends DOCKER_BASE_NAME to every line in the string ${{ inputs.tags }}
+        # prepends DOCKER_BASE_NAME to every entry in the string ${{ inputs.tags }}
         run: |
           echo "TAGS=$(printf '${{ env.DOCKER_BASE_NAME }}/%s,' ${{ inputs.tags }})" >> $GITHUB_OUTPUT
 
