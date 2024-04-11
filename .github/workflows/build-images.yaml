@@ -36,8 +36,8 @@ jobs:
       - name: Format tags
         id: format-tags
         # prepends DOCKER_BASE_NAME to every line in the multiline string ${{ inputs.tags }}
-        run: echo "TAGS=$(echo ${{ inputs.tags }} | sed 's/^/${{ env.DOCKER_BASE_NAME }}:\//g')" >> $GITHUB_OUTPUT
-        
+        run: |
+          echo "${{ inputs.tags }}" | awk '{print "'${DOCKER_BASE_NAME}'/" $0}'
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5

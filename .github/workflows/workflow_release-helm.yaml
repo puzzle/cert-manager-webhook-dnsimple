@@ -1,0 +1,14 @@
+name: Publish new helm release
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'charts/**'
+
+
+jobs:
+  helm-release:
+    name: Release new helm chart version
+    uses: ./.github/workflows/chart-release.yaml

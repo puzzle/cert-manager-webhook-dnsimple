@@ -1,4 +1,4 @@
-name: Publish new release
+name: Publish new docker release
 
 on:
   push:
@@ -16,8 +16,3 @@ jobs:
         ${{ github.ref }}
         commit-${{ github.sha }}
         latest
-
-  webhook-tests:
-    name: Release new helm chart version
-    uses: ./.github/workflows/chart-release.yaml
-    needs: docker-build
