@@ -21,11 +21,10 @@ func TestRunsSuite(t *testing.T) {
 		dns.SetResolvedZone(zone),
 		dns.SetAllowAmbientCredentials(false),
 		dns.SetManifestPath(testdata_dir),
-		dns.SetDNSName("puzzle.beer"),
 		dns.SetUseAuthoritative(false),
 		dns.SetDNSServer("ns1.dnsimple.com:53"),
 		// check against dnsimple nameservers for faster propagation
-		// dns.SetStrict(true),
+		dns.SetStrict(true),
 	)
 
 	fixture.RunConformance(t)
