@@ -37,7 +37,7 @@ jobs:
         id: format-tags
         # prepends DOCKER_BASE_NAME to every entry in the string ${{ inputs.tags }}
         run: |
-          echo "TAGS=$(printf '${{ env.DOCKER_BASE_NAME }}/%s,' ${{ inputs.tags }})" >> $GITHUB_OUTPUT
+          echo "TAGS=$(printf '${{ env.DOCKER_BASE_NAME }}:%s,' ${{ inputs.tags }})" >> $GITHUB_OUTPUT
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
