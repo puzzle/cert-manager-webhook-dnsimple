@@ -55,7 +55,7 @@ jobs:
 
     - name: Wait for cert-manager-webhook-dnsimple to be ready
       run: |
-        kubectl wait --for=condition=available --timeout=600s deployment/cert-manager-webhook-dnsimple
+        kubectl wait --for=condition=available --timeout=600s deployment/cert-manager-webhook-dnsimple -n cert-manager
         kubectl get pods
         kubectl get svc -o wide
 
@@ -90,4 +90,4 @@ jobs:
       env:
         DNSIMPLE_ZONE_NAME: ${{ env.DNSIMPLE_ZONE_NAME }}
       run: |
-        dig +short TXT _acme-challenge.gh-action-test.$DNSIMPLE_ZONE_NAME
+        dig +short TXT _acme-challenge.gh-action-test.$DNSIMPLE_ZONE_NAME @ns1.dnsimple.com
