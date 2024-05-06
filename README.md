@@ -126,6 +126,14 @@ Every push to `master` or on a pull-request triggers the upload of a new docker 
 
 Tagged images are considered stable, these are the ones referenced by the default helm values.
 
+### How to tag
+Create a new tag and push it to the repository. This will trigger a new container build:
+```bash
+git tag -a v0.1.0 -m "Release v0.1.0"
+git push origin v0.1.0
+```
+We recommend the following versioning scheme: `vX.Y.Z` where `X` is the major version, `Y` the minor version and `Z` the patch version.
+
 ### Helm releases
 Helm charts are only released when significant changes occur. We encourage users to update the underlying image versions on their own. A new release can be  triggered manually under the _actions_ tab and running `helm-release`. This only works if a new version was specified in the `Chart.yaml`. The new release will be appended to the [Github pages deployment][4].
 

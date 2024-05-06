@@ -11,6 +11,6 @@ jobs:
     uses: ./.github/workflows/build-images.yaml
     with:
       tags: >
-        ${{ github.ref }}
+        ${{ github.ref_name }}
         commit-${{ github.sha }}
         latest
