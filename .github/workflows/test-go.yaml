@@ -2,6 +2,9 @@ name: Run code tests
 
 on:
   push:
+    paths:
+    - '.github/workflows/**'
+    - 'src/**'
   workflow_call:
     secrets:
       DNSIMPLE_API_TOKEN:
