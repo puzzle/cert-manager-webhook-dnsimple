@@ -126,12 +126,13 @@ jobs:
         end=$(( $(date +%s) + $max_wait_time_seconds ))
         start=$(date +%s) 
 
+        sleep 5
         while [ $(date +%s) -le $end ]; do
-          OUT_CRT=$(kubectl get certificate/dnsimple-test -o json | jsonpath='{.status.conditions}')
-          OUT_CRQ=$(k get CertificateRequest -o json)
+          OUT_CRT=$(kubectl get certificate/dnsimple-test -o jsonpath='{.status.conditions}')
+          OUT_CRQ=$(kubectl get CertificateRequest -o json)
 
           echo "Certificate:"
-          echo "$OUT_CRT" | jq
+          echo "$OUT_CRT"
 
           echo "CertificateRequest:"
           echo "$OUT_CRQ" | jq .items[0].status.conditions
