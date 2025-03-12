@@ -38,6 +38,7 @@ jobs:
         DNSIMPLE_API_TOKEN: ${{ secrets.DNSIMPLE_API_TOKEN }}
         DNSIMPLE_ZONE_NAME: ${{ secrets.DNSIMPLE_ZONE_NAME }}
       shell: 'script -q -e -c "bash {0}"'
+      timeout-minutes: 15
       run: |
         export TEST_ASSET_KUBE_APISERVER=${{ steps.kubebuilder.outputs.BIN_DIR }}/kube-apiserver
         export TEST_ASSET_ETCD=${{ steps.kubebuilder.outputs.BIN_DIR }}/etcd
@@ -60,9 +61,11 @@ jobs:
         # Occasionally, transient network errors can make tests fail
         attempt=0
         max_attempts=3
+        test_exit_code=0
         while [ $attempt -lt $max_attempts ]; do
           attempt=$((attempt+1))
           output=$(go test -v . 2>&1 | tee /dev/tty)
+          test_exit_code=$?
 
           if echo "$output" | grep -q -e "Temporary failure in name resolution" -e "connection reset by peer" -e "i/o timeout"; then
             echo -e "${YLW}Detected transient network error. Retrying... ($attempt/$max_attempts)${NC}"
@@ -70,3 +73,5 @@ jobs:
             break
           fi
         done
+
+        exit $test_exit_code
