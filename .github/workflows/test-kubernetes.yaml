@@ -12,21 +12,26 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # https://kubernetes.io/releases/
+        k8s-version: [1.30, 1.31, 1.32]
+        # https://cert-manager.io/docs/releases/
+        cm-version: [1.16, 1.17]
 
     steps:
     - uses: actions/checkout@v4
 
-
     - name: Start minikube
       uses: medyagh/setup-minikube@master
       with:
-        kubernetes-version: 1.31.3
+        kubernetes-version: ${{ matrix.k8s-version }}
 
 
     - name: Install cert-manager, patch upstream dns servers, wait for readiness
       run: |
-        echo "Target cert-manager version: ${{ vars.TARGET_CERT_MANAGER_VERSION }}"
-        kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/${{ vars.TARGET_CERT_MANAGER_VERSION }}/cert-manager.yaml
+        echo "Target cert-manager version: ${{ matrix.cm-version }}"
+        kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/${{ matrix.cm-version }}/cert-manager.yaml
         # Patch cert-manager to use DNSimple's nameservers for faster propagation-checks
         kubectl patch deployment cert-manager -n cert-manager --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--dns01-recursive-nameservers=ns1.dnsimple.com:53"}]'
         kubectl wait --for=condition=available --timeout=600s deployment/cert-manager-webhook -n cert-manager
@@ -105,7 +110,7 @@ jobs:
     - name: Assert that the DNS record was created
       env:
         DNSIMPLE_ZONE_NAME: ${{ secrets.DNSIMPLE_ZONE_NAME }}
-      timeout-minutes: 10  
+      timeout-minutes: 10
       run: |
         while true; do
           if nslookup -type=TXT _acme-challenge.gh-action-test.$DNSIMPLE_ZONE_NAME ns1.dnsimple.com; then

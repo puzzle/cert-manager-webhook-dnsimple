@@ -129,6 +129,11 @@ Tests can be run locally according to the `Makefile`:
     EOF
     ```
 
+#### GitHub Actions
+Each PR is vetted against a full test suite that tests changes against multiple versions of both Kubernetes and Cert-Manager using a matrix strategy.  
+Generally, tested k8s versions are the [last 3 supported major versions](https://kubernetes.io/releases/).  
+Cert-Manager is tested uisng the [last 2 supported versions](https://cert-manager.io/docs/releases/).
+
 
 ## Releases
 ### Docker images
