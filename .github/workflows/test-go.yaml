@@ -64,7 +64,7 @@ jobs:
           attempt=$((attempt+1))
           output=$(go test -v . 2>&1 | tee /dev/tty)
 
-          if echo "$output" | grep -q -e "Temporary failure in name resolution" -e "connection reset by peer"; then
+          if echo "$output" | grep -q -e "Temporary failure in name resolution" -e "connection reset by peer" -e "i/o timeout"; then
             echo -e "${YLW}Detected transient network error. Retrying... ($attempt/$max_attempts)${NC}"
           else
             break
