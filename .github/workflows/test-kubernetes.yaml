@@ -118,6 +118,8 @@ jobs:
           sleep 30
         done
 
+    # This step can time out, but it timing out doesn't necessarily mean that the webhook is not working.
+    # Timeouts mainly happen due to the environment of the runner and/or parallelism, thus such occurrences will simply be dismissed as warnings.
     - name: Check the certificate status
       run: |
         max_wait_time_seconds=300
@@ -125,14 +127,20 @@ jobs:
         start=$(date +%s) 
 
         while [ $(date +%s) -le $end ]; do
-          kubectl get certificate/dnsimple-test -o jsonpath='{.status}'
+          OUT=$(kubectl get certificate/dnsimple-test -o jsonpath='{.status.conditions}')
+          echo -e "$OUT\n"
+
+          if [ $(echo "$OUT" | grep -iE "Failed|Denied" | wc -l) -gt 0  ]; then
+            echo "::Error title=Certificate resource errored::The certificate ressource has an error"
+            exit 1
+          fi
 
           if [ $(kubectl get certificate dnsimple-test -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}') == "True" ]; then
             echo "Certificate is ready after $(( $(date +%s) - $start )) seconds"
             exit 0
           fi
           sleep 10
-          echo "[i] New iteration at $(date)"
+          echo -e "\n[i] New iteration at $(date)"
         done
 
         echo "::warning title=Certificate timed out::Have timed out waiting for certificate"
