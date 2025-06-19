@@ -48,7 +48,7 @@ jobs:
             FILTERED_PRS=$(echo "$MERGED_PRS" | jq '[.[] | select(.author.login != "app/renovate") | select((.labels | length < 1) or (.labels | all(.name != "patch")))]')
             FILTERED_PRS_AMOUNT=$(echo $FILTERED_PRS | jq length)
             if [ "$FILTERED_PRS_AMOUNT" -gt 0 ]; then
-              echo "::warning title=Non-patch PRs found::A total of $FILTERED_PRS_AMOUNT that are possibly not patch releases have been found"
+              echo "::warning title=Non-patch PRs found::A total of $FILTERED_PRS_AMOUNT PRs that are possibly not patch releases have been found"
               echo $FILTERED_PRS | jq '.[] | {title: .title, author: "\(.author.login) (\(.author.name))", url: "https://github.com/puzzle/cert-manager-webhook-dnsimple/pull/\(.number)", number: .number}'
               echo "has_changes=false" >> "$GITHUB_OUTPUT"
               echo "non_patch_prs=true" >> "$GITHUB_OUTPUT"
@@ -69,7 +69,7 @@ jobs:
           THIS_RUN=$(gh run --repo ${{ github.repository }} view ${{ github.run_id }} --json jobs --jq '.jobs[] | select(.name == "${{ github.job }}") | .url')
           MSG=$(cat <<EOF
           :warning: Did not create an automated patch release because it could contain PRs with changes more impactful than just a patch.
-          [Check the logs of the latest run]($THIS_RUN) please and manually create a release after review :isforme:
+          [Check the logs of the latest run](${THIS_RUN}#step:4:1) please and manually create a release after review :isforme:
           EOF
           )
           
