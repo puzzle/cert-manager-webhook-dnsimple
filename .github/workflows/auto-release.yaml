@@ -41,7 +41,7 @@ jobs:
           if [ "$LAST_RELEASE" = "none" ]; then
             MERGED_PRS=$(gh pr list --state merged --limit 1 --json number)
           else
-            MERGED_PRS=$(gh pr list --state merged --base ${{ github.event.repository.default_branch }} --search "merged:>=$(git log -1 --format=%aI $LAST_RELEASE | cut -d'T' -f1)" --json --json author,title,labels,number)
+            MERGED_PRS=$(gh pr list --state merged --base ${{ github.event.repository.default_branch }} --search "merged:>=$(git log -1 --format=%aI $LAST_RELEASE | cut -d'T' -f1)" --json author,title,labels,number)
           fi
 
           if [ "$(echo $MERGED_PRS | jq '. | length')" -gt 0 ]; then
@@ -57,7 +57,7 @@ jobs:
             
             echo "has_changes=true" >> "$GITHUB_OUTPUT"
             exit 0
-          else
+          fi
             
           echo "has_changes=false" >> "$GITHUB_OUTPUT"
 
