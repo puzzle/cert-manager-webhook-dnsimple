@@ -4,9 +4,6 @@ on:
   #schedule:
   #  - cron: '0 0 1 * *'
   workflow_dispatch:
-  push:
-    branches:
-      - change/releases
 
 jobs:
   check:
@@ -30,7 +27,7 @@ jobs:
           echo "Latest release $(echo "$RELEASE" | jq .name) was published at $CREATED_AT, $DAYS_DIFF days ago."
           echo "skip=$([ $DAYS_DIFF -lt 30 ] && echo "true" || echo "false")" >> "$GITHUB_OUTPUT"
 
-      # Any PR since last release that is not authored by renovate and does NOT have a "patch" label will cause this run to be skipped.
+      # Any PR since last month that is not authored by renovate and does NOT have a "patch" label will cause this run to be skipped.
       # Renovate automerges minor changes as well, but we consider such as patches as it's only affects packages.
       - name: Check for merged PRs since last release
         id: check-prs
