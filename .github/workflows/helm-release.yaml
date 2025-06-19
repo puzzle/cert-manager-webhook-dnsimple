@@ -4,6 +4,11 @@ name: Release a new chart version
 
 on:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      release-body-addendum:
+        type: string
+        required: false
 
 jobs:
   release:
@@ -40,6 +45,11 @@ jobs:
           
           # Workaround to get newlines working
           echo -e "### Changes since \`${LAST_TAG}\`\n\n${COMMITS}" > msg
+
+          if [[ -n "${{ inputs.release-body-addendum }}" ]]; then
+            echo -e "\n${{ inputs.release-body-addendum }}" >> msg
+          fi
+
           gh release edit ${CURRENT_TAG} --notes "$(cat msg)"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

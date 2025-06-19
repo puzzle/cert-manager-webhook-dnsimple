@@ -1,0 +1,129 @@
+name: Automated patch release
+
+on:
+  #schedule:
+  #  - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # We only continue if the last release was actually a month ago
+      - name: Check age of last release
+        id: check-age
+        run: |
+          RELEASE=$(gh release view --json name,createdAt)
+          CREATED_AT=$(echo "$RELEASE" | jq -r .createdAt)
+          CREATED_TIMESTAMP=$(date -d "$CREATED_AT" +%s)
+          CURRENT_TIMESTAMP=$(date +%s)
+          DAYS_DIFF=$(( ($CURRENT_TIMESTAMP - $CREATED_TIMESTAMP) / 86400 ))
+
+          echo "Latest release $(echo "$RELEASE" | jq .name) was published at $CREATED_AT, $DAYS_DIFF days ago."
+          echo "skip=$([ $DAYS_DIFF -lt 30 ] && echo "true" || echo "false")" >> "$GITHUB_OUTPUT"
+
+      # Any PR since last month that is not authored by renovate and does NOT have a "patch" label will cause this run to be skipped.
+      # Renovate automerges minor changes as well, but we consider such as patches as it's only affects packages.
+      - name: Check for merged PRs since last release
+        id: check-prs
+        if: ${{ steps.check-age.outputs.skip != 'true' }}
+        run: |
+          LAST_RELEASE=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
+          if [ "$LAST_RELEASE" = "none" ]; then
+            MERGED_PRS=$(gh pr list --state merged --limit 1 --json number)
+          else
+            MERGED_PRS=$(gh pr list --state merged --base ${{ github.event.repository.default_branch }} --search "merged:>=$(git log -1 --format=%aI $LAST_RELEASE | cut -d'T' -f1)" --json --json author,title,labels,number)
+          fi
+
+          if [ "$(echo $MERGED_PRS | jq '. | length')" -gt 0 ]; then
+            FILTERED_PRS=$(echo "$MERGED_PRS" | jq '[.[] | select(.author.login != "app/renovate") | select((.labels | length < 1) or (.labels | all(.name != "patch")))]')
+            FILTERED_PRS_AMOUNT=$(echo $FILTERED_PRS | jq length)
+            if [ "$FILTERED_PRS_AMOUNT" -gt 0 ]; then
+              echo "::warning title=Non-patch PRs found::A total of $FILTERED_PRS_AMOUNT that are possibly not patch releases have been found"
+              echo $FILTERED_PRS | jq '.[] | {title: .title, author: "\(.author.login) (\(.author.name))", url: "https://github.com/puzzle/cert-manager-webhook-dnsimple/pull/\(.number)", number: .number}'
+              echo "has_changes=false" >> "$GITHUB_OUTPUT"
+              echo "non_patch_prs=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          else
+            
+          echo "has_changes=false" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify if bad
+        if: ${{ steps.check-prs.outputs.has_changes == 'false' && steps.check-prs.outputs.non_patch_prs == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          THIS_RUN=$(gh run --repo ${{ github.repository }} view ${{ github.run_id }} --json jobs --jq '.jobs[] | select(.name == "${{ github.job }}") | .url')
+          MSG=$(cat <<EOF
+          :warning: Did not create an automated patch release because it could contain PRs with changes more impactful than just a patch.
+          [Check the logs of the latest run]($THIS_RUN) please and manually create a release after review :isforme:
+          EOF
+          )
+          
+          BODY=$(cat .github/workflows/rk_body.json | jq ".text = \"$MSG\"")
+          curl -X POST -H 'Content-Type: application/json' --data "$BODY" ${{ secrets.RK_WEBHOOK_URL }}
+
+  update:
+    needs: check
+    if: ${{ needs.check.outputs.has_changes == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get new versions
+        id: new-versions
+        run: |
+          bump_patch() {
+            clean=$(echo "$1" | sed 's|[v\"]||g')
+
+            major=$(echo "$clean" | cut -d. -f1)
+            minor=$(echo "$clean" | cut -d. -f2)
+            patch=$(echo "$clean" | cut -d. -f3)
+
+            patch=$((patch + 1))
+
+            echo "$major.$minor.$patch"
+          }
+
+          CHART_VERSION=$(bump_patch $(cat charts/cert-manager-webhook-dnsimple/Chart.yaml | grep "version:" | awk '{print $2}'))
+          APP_VERSION=$(echo "v$(bump_patch $(cat charts/cert-manager-webhook-dnsimple/Chart.yaml | grep 'appVersion:' | awk '{print $2}'))")
+          TAG=$(echo "v$(bump_patch $(git describe --tags --abbrev=0 --match 'v*'))")
+
+          echo -e "New app version: $APP_VERSION\nNew chart version: $CHART_VERSION\nNew tag: $TAG"
+
+          echo "chart=$CHART_VERSION" >> "$GITHUB_OUTPUT"
+          echo "app=$APP_VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Update versions
+        id: update-versions
+        run: |
+          cat charts/cert-manager-webhook-dnsimple/Chart.yaml | sed 's|appVersion:.*|appVersion: "${{ steps.new-versions.outputs.app }}"|'
+          cat charts/cert-manager-webhook-dnsimple/Chart.yaml | sed 's|version:.*|version: ${{ steps.new-versions.outputs.chart }}|'
+
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add charts/cert-manager-webhook-dnsimple/Chart.yaml
+          git commit -m "chore: Update versions for release ${{ steps.new-versions.outputs.tag }}"
+          git tag -a "${{ steps.new-versions.outputs.tag }}" -m "Release ${{ steps.new-versions.outputs.tag }}"
+          git tag
+        #git push origin "${{ steps.new-versions.outputs.tag }}"
+  
+#  trigger-release:
+#    needs: check-and-release
+#    if: ${{ needs.check-and-release.outputs.check-prs.has_changes == 'true' }}
+#    uses: .github/workflows/helm-release.yaml
+#    with:
+#      release-body-addendum: "Automated release"
