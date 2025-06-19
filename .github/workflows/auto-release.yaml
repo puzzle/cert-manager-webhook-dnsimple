@@ -17,6 +17,8 @@ jobs:
       # We only continue if the last release was actually a month ago
       - name: Check age of last release
         id: check-age
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           RELEASE=$(gh release view --json name,createdAt)
           CREATED_AT=$(echo "$RELEASE" | jq -r .createdAt)
@@ -32,6 +34,8 @@ jobs:
       - name: Check for merged PRs since last release
         id: check-prs
         if: ${{ steps.check-age.outputs.skip != 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           LAST_RELEASE=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
           if [ "$LAST_RELEASE" = "none" ]; then
@@ -56,8 +60,6 @@ jobs:
           else
             
           echo "has_changes=false" >> "$GITHUB_OUTPUT"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Notify if bad
         if: ${{ steps.check-prs.outputs.has_changes == 'false' && steps.check-prs.outputs.non_patch_prs == 'true' }}
