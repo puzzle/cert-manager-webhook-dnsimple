@@ -8,6 +8,9 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.check-prs.outputs.has_changes }}
+      non_patch_prs: ${{ steps.check-prs.outputs.non_patch_prs }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -84,6 +87,10 @@ jobs:
     needs: check
     if: ${{ needs.check.outputs.has_changes == 'true' }}
     runs-on: ubuntu-latest
+    outputs:
+      chart: ${{ steps.new-versions.outputs.chart }}
+      app: ${{ steps.new-versions.outputs.app }}
+      tag: ${{ steps.new-versions.outputs.tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -166,8 +173,10 @@ jobs:
 #      release-body-addendum: "Automated release"
 
   notify:
-    needs: update
-    if: always()
+    needs:
+      - update
+      - check
+    if: ${{ always() && needs.check.outputs.non_patch_prs != 'true' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
