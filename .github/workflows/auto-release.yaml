@@ -141,7 +141,7 @@ jobs:
           git commit -m "chore: Update versions for release ${{ steps.new-versions.outputs.tag }}"
           git tag -a "${{ steps.new-versions.outputs.tag }}" -m "Release ${{ steps.new-versions.outputs.tag }}"
           git tag
-          #git push origin "${{ steps.new-versions.outputs.tag }}"
+          git push origin "${{ steps.new-versions.outputs.tag }}"
 
       - name: Await docker build
         id: docker-build
@@ -149,6 +149,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |          
           echo "Waiting for release workflow to complete..."
+          sleep 5
 
           # ID can be derived using 'gh workflow list'
           # The ID below is of the "Build tagged Docker image" workflow
