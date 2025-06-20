@@ -142,43 +142,44 @@ jobs:
           git tag -a "${{ steps.new-versions.outputs.tag }}" -m "Release ${{ steps.new-versions.outputs.tag }}"
           git tag
           #git push origin "${{ steps.new-versions.outputs.tag }}"
-#
-#      - name: Await docker build
-#        id: docker-build
-#        env:
-#          GH_TOKEN: ${{ github.token }}
-#        run: |          
-#          echo "Waiting for release workflow to complete..."
-#
-#          # ID can be derived using 'gh workflow list'
-#          # The ID below is of the "Build tagged Docker image" workflow
-#          WORKFLOW_ID=99918803
-#
-#          for i in {1..30}; do
-#            RUN_DETAILS=$(gh run list --workflow="$WORKFLOW_ID" --branch="${{ steps.new-versions.outputs.tag }}" --json --json conclusion,status,url,databaseId)
-#            if [ $(echo $RUN_DETAILS | jq length) -gt 0 ]; then
-#              RUN_ID=$(echo $RUN_DETAILS | jq -r .[0].databaseId)
-#              STATUS=$(gh run view "$RUN_ID" --json conclusion --jq .conclusion)
-#              if [ "$STATUS" = "success" ]; then
-#                echo "Docker build workflow has concluded"
-#                exit 0
-#              elif [ "$STATUS" = "failure" ]; then
-#                echo "::error title=Docker build failed::Docker build action has failed"
-#                exit 1
-#              fi
-#            fi
-#            sleep 10
-#          done
-#
-#          echo "::error title=Docker build timed out::Timed out awaiting docker build action"
-#          exit 1
+
+      - name: Await docker build
+        id: docker-build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |          
+          echo "Waiting for release workflow to complete..."
+
+          # ID can be derived using 'gh workflow list'
+          # The ID below is of the "Build tagged Docker image" workflow
+          WORKFLOW_ID=99918806
+          RUN_DETAILS=$(gh run list --workflow="$WORKFLOW_ID" --branch="${{ steps.new-versions.outputs.tag }}" --json conclusion,status,url,databaseId)
+          echo $RUN_DETAILS | jq -r .[0].url
+
+          for i in {1..30}; do
+            RUN_DETAILS=$(gh run list --workflow="$WORKFLOW_ID" --branch="${{ steps.new-versions.outputs.tag }}" --json conclusion,status,url,databaseId)
+            if [ $(echo $RUN_DETAILS | jq length) -gt 0 ]; then
+              RUN_ID=$(echo $RUN_DETAILS | jq -r .[0].databaseId)
+              STATUS=$(gh run view "$RUN_ID" --json conclusion --jq .conclusion)
+              if [ "$STATUS" = "success" ]; then
+                echo "Docker build workflow has concluded"
+                exit 0
+              elif [ "$STATUS" = "failure" ]; then
+                echo "::error title=Docker build failed::Docker build action has failed"
+                exit 1
+              fi
+            fi
+            sleep 10
+          done
+
+          echo "::error title=Docker build timed out::Timed out awaiting docker build action"
+          exit 1
   
-#  trigger-release:
-#    needs: update
-#    if: ${{ needs.update.check-prs.has_changes == 'true' }}
-#    uses: .github/workflows/helm-release.yaml
-#    with:
-#      release-body-addendum: "Automated release"
+  trigger-release:
+    needs: update
+    uses: .github/workflows/helm-release.yaml
+    with:
+      release-body-addendum: "Automated release"
 
   # Only notify on success or failure
   notify:
@@ -195,10 +196,13 @@ jobs:
         GH_TOKEN: ${{ github.token }}
       run: |
         THIS_RUN=$(gh run --repo ${{ github.repository }} view ${{ github.run_id }} --json jobs --jq '.jobs[] | select(.name == "${{ github.job }}") | .url')
-        CONCLUSION=$(gh run view ${{ github.run_id }} --json jobs | jq -r '.jobs[] | select(.name == "update") | .conclusion')
-        echo "Update job conclusion: $CONCLUSION"
         
-        if [ "$CONCLUSION" == "success" ]; then
+        CONCLUSION=$(gh run view ${{ github.run_id }} --json jobs | jq -r '.jobs[] | select(.name == "update") | .conclusion')
+        TRIGGER_CONCLUSION=$(gh run view ${{ github.run_id }} --json jobs | jq -r '.jobs[] | select(.name == "trigger-release") | .conclusion')
+        echo "Update job conclusion: $CONCLUSION"
+        echo "Trigger-release job conclusion: $TRIGGER_CONCLUSION"
+        
+        if [ "$CONCLUSION" == "success" -a "$TRIGGER_CONCLUSION" == "success" ]; then
           MSG=$(cat <<EOF
         :white_check_mark: Automated patch release completed successfully!
         New chart version: ${{ needs.update.outputs.chart }}
@@ -206,8 +210,11 @@ jobs:
         New tag: ${{ needs.update.outputs.tag }}
         EOF
         )
-        elif [ "$CONCLUSION" == "failure" ]; then
+
+        elif [ "$CONCLUSION" == "failure" -o "$TRIGGER_CONCLUSION" == "failure" ]; then
           MSG=":x: Automated patch release failed. Please [check the logs]($THIS_RUN)."
+        else
+          MSG=":warning: Automated patch release possibly failed! Please [check the logs]($THIS_RUN)."
         fi
         
         if [ -n "$MSG" ]; then
