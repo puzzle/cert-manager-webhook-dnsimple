@@ -153,7 +153,7 @@ jobs:
           echo "Git tags AFTER creating our own (${{ steps.new-versions.outputs.tag }})"
           git tag
           
-          git push origin "${{ steps.new-versions.outputs.tag }}"
+          git push && git push origin "${{ steps.new-versions.outputs.tag }}"
 
       - name: Await docker build
         id: docker-build
