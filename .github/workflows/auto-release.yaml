@@ -62,6 +62,7 @@ jobs:
           echo "has_changes=false" >> "$GITHUB_OUTPUT"
 
       - name: Notify if bad
+        id: notify-abort
         if: ${{ steps.check-prs.outputs.has_changes == 'false' && steps.check-prs.outputs.non_patch_prs == 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
@@ -161,9 +162,12 @@ jobs:
 #      release-body-addendum: "Automated release"
 
   notify:
-    if: always()
+    needs: check
+    if: $${{ always() && !needs.check.outputs.non_patch_prs }}
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v4
+    
     - name: Notify status
       env:
         GH_TOKEN: ${{ github.token }}
