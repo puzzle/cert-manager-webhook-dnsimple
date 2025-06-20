@@ -94,6 +94,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      # fetch-tags: true is broken
+      - name: Fetch all tags
+        run: git fetch --depth=1 --tags
 
       - name: Get new versions
         id: new-versions
@@ -112,7 +116,7 @@ jobs:
 
           CHART_VERSION=$(bump_patch $(cat charts/cert-manager-webhook-dnsimple/Chart.yaml | grep "version:" | awk '{print $2}'))
           APP_VERSION=$(echo "v$(bump_patch $(cat charts/cert-manager-webhook-dnsimple/Chart.yaml | grep 'appVersion:' | awk '{print $2}'))")
-          TAG=$(echo "v$(bump_patch $(git describe --tags --abbrev=0 --match 'v*'))")
+          TAG=$(echo "v$(bump_patch $(git tag -l 'v*' --sort=committerdate | tail -n 1))")
 
           echo -e "New app version: $APP_VERSION\nNew chart version: $CHART_VERSION\nNew tag: $TAG"
 
@@ -172,6 +176,7 @@ jobs:
 #    with:
 #      release-body-addendum: "Automated release"
 
+  # Only notify on success or failure
   notify:
     needs:
       - update
