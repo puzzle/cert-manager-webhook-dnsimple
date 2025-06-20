@@ -127,17 +127,21 @@ jobs:
       - name: Update versions
         id: update-versions
         run: |
-          sed -i 's|^appVersion:.*|appVersion: "${{ steps.new-versions.outputs.app }}"|' charts/cert-manager-webhook-dnsimple/Chart.yaml
-          sed -i 's|^version:.*|version: ${{ steps.new-versions.outputs.chart }}|' charts/cert-manager-webhook-dnsimple/Chart.yaml
-          cat charts/cert-manager-webhook-dnsimple/Chart.yaml
+          export TERM=xterm-color
+          yq e '.appVersion = "${{ steps.new-versions.outputs.app }}"' -i charts/cert-manager-webhook-dnsimple/Chart.yaml
+          yq e '.version = "${{ steps.new-versions.outputs.chart }}"' -i charts/cert-manager-webhook-dnsimple/Chart.yaml
+          yq e '.image.tag = "${{ steps.new-versions.outputs.tag }}"' -i charts/cert-manager-webhook-dnsimple/values.yaml
+
+          git diff
 
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git add charts/cert-manager-webhook-dnsimple/Chart.yaml
+
           git commit -m "chore: Update versions for release ${{ steps.new-versions.outputs.tag }}"
           git tag -a "${{ steps.new-versions.outputs.tag }}" -m "Release ${{ steps.new-versions.outputs.tag }}"
           git tag
-#      #git push origin "${{ steps.new-versions.outputs.tag }}"
+          #git push origin "${{ steps.new-versions.outputs.tag }}"
 #
 #      - name: Await docker build
 #        id: docker-build
