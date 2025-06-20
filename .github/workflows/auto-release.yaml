@@ -163,7 +163,7 @@ jobs:
 
   notify:
     needs: check
-    if: $${{ always() && !needs.check.outputs.non_patch_prs }}
+    if: $${{ always() && needs.check.outputs.non_patch_prs != 'true' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
