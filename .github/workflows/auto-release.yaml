@@ -121,11 +121,59 @@ jobs:
           git commit -m "chore: Update versions for release ${{ steps.new-versions.outputs.tag }}"
           git tag -a "${{ steps.new-versions.outputs.tag }}" -m "Release ${{ steps.new-versions.outputs.tag }}"
           git tag
-        #git push origin "${{ steps.new-versions.outputs.tag }}"
+#      #git push origin "${{ steps.new-versions.outputs.tag }}"
+#
+#      - name: Await docker build
+#        id: docker-build
+#        env:
+#          GH_TOKEN: ${{ github.token }}
+#        run: |          
+#          echo "Waiting for release workflow to complete..."
+#
+#          # ID can be derived using 'gh workflow list'
+#          # The ID below is of the "Build tagged Docker image" workflow
+#          WORKFLOW_ID=99918803
+#
+#          for i in {1..30}; do
+#            RUN_DETAILS=$(gh run list --workflow="$WORKFLOW_ID" --branch="${{ steps.new-versions.outputs.tag }}" --json --json conclusion,status,url,databaseId)
+#            if [ $(echo $RUN_DETAILS | jq length) -gt 0 ]; then
+#              RUN_ID=$(echo $RUN_DETAILS | jq -r .[0].databaseId)
+#              STATUS=$(gh run view "$RUN_ID" --json conclusion --jq .conclusion)
+#              if [ "$STATUS" = "success" ]; then
+#                echo "Docker build workflow has concluded"
+#                exit 0
+#              elif [ "$STATUS" = "failure" ]; then
+#                echo "::error title=Docker build failed::Docker build action has failed"
+#                exit 1
+#              fi
+#            fi
+#            sleep 10
+#          done
+#
+#          echo "::error title=Docker build timed out::Timed out awaiting docker build action"
+#          exit 1
   
 #  trigger-release:
-#    needs: check-and-release
-#    if: ${{ needs.check-and-release.outputs.check-prs.has_changes == 'true' }}
+#    needs: update
+#    if: ${{ needs.update.check-prs.has_changes == 'true' }}
 #    uses: .github/workflows/helm-release.yaml
 #    with:
 #      release-body-addendum: "Automated release"
+
+  notify:
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - name: Notify status
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        THIS_RUN=$(gh run --repo ${{ github.repository }} view ${{ github.run_id }} --json jobs --jq '.jobs[] | select(.name == "${{ github.job }}") | .url')
+        if gh run view ${{ github.run_id }} --json jobs --jq '.jobs[] | select(.name == "update") | .conclusion' | grep -q "success"; then
+          MSG=":white_check_mark: Automated patch release completed successfully!\nChart version: ${}"
+        else
+          MSG=":x: Automated patch release failed. Please [check the logs]($THIS_RUN)."
+        fi
+        
+        BODY=$(cat .github/workflows/rk_body.json | jq ".text = \"$MSG\"")
+        curl -X POST -H 'Content-Type: application/json' --data "$BODY" ${{ secrets.RK_WEBHOOK_URL }}
