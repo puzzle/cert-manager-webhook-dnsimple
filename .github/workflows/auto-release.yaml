@@ -92,8 +92,17 @@ jobs:
       app: ${{ steps.new-versions.outputs.app }}
       tag: ${{ steps.new-versions.outputs.tag }}
     steps:
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ vars.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_SECRET }}
+  
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          token: ${{ steps.app-token.outputs.token }}
       
       # fetch-tags: true is broken
       - name: Fetch all tags
@@ -140,7 +149,10 @@ jobs:
 
           git commit -m "chore: Update versions for release ${{ steps.new-versions.outputs.tag }}"
           git tag -a "${{ steps.new-versions.outputs.tag }}" -m "Release ${{ steps.new-versions.outputs.tag }}"
+
+          echo "Git tags AFTER creating our own (${{ steps.new-versions.outputs.tag }})"
           git tag
+          
           git push origin "${{ steps.new-versions.outputs.tag }}"
 
       - name: Await docker build
