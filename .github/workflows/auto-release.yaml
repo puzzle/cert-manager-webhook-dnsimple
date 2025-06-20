@@ -50,15 +50,18 @@ jobs:
             if [ "$FILTERED_PRS_AMOUNT" -gt 9 ]; then
               echo "::warning title=Non-patch PRs found::A total of $FILTERED_PRS_AMOUNT PRs that are possibly not patch releases have been found"
               echo $FILTERED_PRS | jq '.[] | {title: .title, author: "\(.author.login) (\(.author.name))", url: "https://github.com/puzzle/cert-manager-webhook-dnsimple/pull/\(.number)", number: .number}'
+              
               echo "has_changes=false" >> "$GITHUB_OUTPUT"
               echo "non_patch_prs=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             
+            echo "Has changes"
             echo "has_changes=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-            
+          
+          echo "Has no changes"
           echo "has_changes=false" >> "$GITHUB_OUTPUT"
 
       - name: Notify if bad
