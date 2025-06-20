@@ -50,7 +50,7 @@ jobs:
           if [ "$(echo $MERGED_PRS | jq '. | length')" -gt 0 ]; then
             FILTERED_PRS=$(echo "$MERGED_PRS" | jq '[.[] | select(.author.login != "app/renovate") | select((.labels | length < 1) or (.labels | all(.name != "patch")))]')
             FILTERED_PRS_AMOUNT=$(echo $FILTERED_PRS | jq length)
-            if [ "$FILTERED_PRS_AMOUNT" -gt 9 ]; then
+            if [ "$FILTERED_PRS_AMOUNT" -gt 0 ]; then
               echo "::warning title=Non-patch PRs found::A total of $FILTERED_PRS_AMOUNT PRs that are possibly not patch releases have been found"
               echo $FILTERED_PRS | jq '.[] | {title: .title, author: "\(.author.login) (\(.author.name))", url: "https://github.com/puzzle/cert-manager-webhook-dnsimple/pull/\(.number)", number: .number}'
               
@@ -182,7 +182,7 @@ jobs:
                 exit 1
               fi
             fi
-            sleep 10
+            sleep 20
           done
 
           echo "::error title=Docker build timed out::Timed out awaiting docker build action"
@@ -211,7 +211,7 @@ jobs:
         THIS_RUN=$(gh run --repo ${{ github.repository }} view ${{ github.run_id }} --json jobs --jq '.jobs[] | select(.name == "${{ github.job }}") | .url')
         
         CONCLUSION=$(gh run view ${{ github.run_id }} --json jobs | jq -r '.jobs[] | select(.name == "update") | .conclusion')
-        TRIGGER_CONCLUSION=$(gh run view ${{ github.run_id }} --json jobs | jq -r '.jobs[] | select(.name == "trigger-release") | .conclusion')
+        TRIGGER_CONCLUSION=$(gh run view ${{ github.run_id }} --json jobs | jq -r '.jobs[] | select(.name | startswith("trigger-release")) | .conclusion')
         echo "Update job conclusion: $CONCLUSION"
         echo "Trigger-release job conclusion: $TRIGGER_CONCLUSION"
         
