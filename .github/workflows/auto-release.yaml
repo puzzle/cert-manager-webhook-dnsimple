@@ -47,7 +47,7 @@ jobs:
           if [ "$(echo $MERGED_PRS | jq '. | length')" -gt 0 ]; then
             FILTERED_PRS=$(echo "$MERGED_PRS" | jq '[.[] | select(.author.login != "app/renovate") | select((.labels | length < 1) or (.labels | all(.name != "patch")))]')
             FILTERED_PRS_AMOUNT=$(echo $FILTERED_PRS | jq length)
-            if [ "$FILTERED_PRS_AMOUNT" -gt 0 ]; then
+            if [ "$FILTERED_PRS_AMOUNT" -gt 9 ]; then
               echo "::warning title=Non-patch PRs found::A total of $FILTERED_PRS_AMOUNT PRs that are possibly not patch releases have been found"
               echo $FILTERED_PRS | jq '.[] | {title: .title, author: "\(.author.login) (\(.author.name))", url: "https://github.com/puzzle/cert-manager-webhook-dnsimple/pull/\(.number)", number: .number}'
               echo "has_changes=false" >> "$GITHUB_OUTPUT"
@@ -113,8 +113,9 @@ jobs:
       - name: Update versions
         id: update-versions
         run: |
-          cat charts/cert-manager-webhook-dnsimple/Chart.yaml | sed 's|appVersion:.*|appVersion: "${{ steps.new-versions.outputs.app }}"|'
-          cat charts/cert-manager-webhook-dnsimple/Chart.yaml | sed 's|version:.*|version: ${{ steps.new-versions.outputs.chart }}|'
+          sed -i 's|^appVersion:.*|appVersion: "${{ steps.new-versions.outputs.app }}"|' charts/cert-manager-webhook-dnsimple/Chart.yaml
+          sed -i 's|^version:.*|version: ${{ steps.new-versions.outputs.chart }}|' charts/cert-manager-webhook-dnsimple/Chart.yaml
+          cat charts/cert-manager-webhook-dnsimple/Chart.yaml
 
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
