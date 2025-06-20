@@ -162,8 +162,8 @@ jobs:
 #      release-body-addendum: "Automated release"
 
   notify:
-    needs: check
-    if: $${{ always() && needs.check.outputs.non_patch_prs != 'true' }}
+    needs: update
+    if: always()
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -173,11 +173,22 @@ jobs:
         GH_TOKEN: ${{ github.token }}
       run: |
         THIS_RUN=$(gh run --repo ${{ github.repository }} view ${{ github.run_id }} --json jobs --jq '.jobs[] | select(.name == "${{ github.job }}") | .url')
-        if gh run view ${{ github.run_id }} --json jobs --jq '.jobs[] | select(.name == "update") | .conclusion' | grep -q "success"; then
-          MSG=":white_check_mark: Automated patch release completed successfully!\nChart version: ${}"
-        else
+        CONCLUSION=$(gh run view ${{ github.run_id }} --json jobs | jq -r '.jobs[] | select(.name == "update") | .conclusion')
+        echo "Update job conclusion: $CONCLUSION"
+        
+        if [ "$CONCLUSION" == "success" ]; then
+          MSG=$(cat <<EOF
+        :white_check_mark: Automated patch release completed successfully!
+        New chart version: ${{ needs.update.outputs.chart }}
+        New app version: ${{ needs.update.outputs.app }}
+        New tag: ${{ needs.update.outputs.tag }}
+        EOF
+        )
+        elif [ "$CONCLUSION" == "failure" ]; then
           MSG=":x: Automated patch release failed. Please [check the logs]($THIS_RUN)."
         fi
         
-        BODY=$(cat .github/workflows/rk_body.json | jq ".text = \"$MSG\"")
-        curl -X POST -H 'Content-Type: application/json' --data "$BODY" ${{ secrets.RK_WEBHOOK_URL }}
+        if [ -n "$MSG" ]; then
+          BODY=$(cat .github/workflows/rk_body.json | jq ".text = \"$MSG\"")
+          curl -X POST -H 'Content-Type: application/json' --data "$BODY" ${{ secrets.RK_WEBHOOK_URL }}
+        fi
