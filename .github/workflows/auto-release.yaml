@@ -147,7 +147,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git add -u
 
-          git commit -m "chore: Update versions for release ${{ steps.new-versions.outputs.tag }}"
+          git commit -m "chore: Update versions for chart release ${{ steps.new-versions.outputs.chart }}"
           git tag -a "${{ steps.new-versions.outputs.tag }}" -m "Release ${{ steps.new-versions.outputs.tag }}"
 
           echo "Git tags AFTER creating our own (${{ steps.new-versions.outputs.tag }})"
