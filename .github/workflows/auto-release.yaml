@@ -177,7 +177,7 @@ jobs:
   
   trigger-release:
     needs: update
-    uses: .github/workflows/helm-release.yaml
+    uses: ./.github/workflows/helm-release.yaml
     with:
       release-body-addendum: "Automated release"
 
