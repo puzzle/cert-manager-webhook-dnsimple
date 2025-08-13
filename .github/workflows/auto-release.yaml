@@ -32,8 +32,8 @@ jobs:
           echo "Latest release $(echo "$RELEASE" | jq .name) was published at $CREATED_AT, $DAYS_DIFF days ago."
           echo "skip=$([ $DAYS_DIFF -lt 30 ] && echo "true" || echo "false")" >> "$GITHUB_OUTPUT"
 
-      # Any PR since last month that is not authored by renovate and does NOT have a "patch" label will cause this run to be skipped.
-      # Renovate automerges minor changes as well, but we consider such as patches as it's only affects packages.
+      # Any PR since last month that is NOT authored by renovate, does NOT have a "patch" or "documentation" label or NO labels at all will cause this run to be skipped.
+      # Renovate automerges minor changes as well, but we consider those as patches as it only affects packages.
       - name: Check for merged PRs since last release
         id: check-prs
         if: ${{ steps.check-age.outputs.skip != 'true' }}
@@ -48,7 +48,7 @@ jobs:
           fi
 
           if [ "$(echo $MERGED_PRS | jq '. | length')" -gt 0 ]; then
-            FILTERED_PRS=$(echo "$MERGED_PRS" | jq '[.[] | select(.author.login != "app/renovate") | select((.labels | length < 1) or (.labels | all(.name != "patch")))]')
+            FILTERED_PRS=$(echo "$MERGED_PRS" | jq '[.[] | select(.author.login != "app/renovate") | select((.labels | length < 1) or (.labels | all(.name != "patch" and .name != "documentation")))]')
             FILTERED_PRS_AMOUNT=$(echo $FILTERED_PRS | jq length)
             if [ "$FILTERED_PRS_AMOUNT" -gt 0 ]; then
               echo "::warning title=Non-patch PRs found::A total of $FILTERED_PRS_AMOUNT PRs that are possibly not patch releases have been found"
