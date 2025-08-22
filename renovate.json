@@ -19,6 +19,12 @@
       "matchCurrentVersion": "!/^0/",
       "labels": [ "minor" ],
       "automerge": true
+    },
+    {
+      "matchUpdateTypes": [ "major" ],
+      "matchCurrentVersion": "!/^0/",
+      "labels": [ "major" ],
+      "automerge": false
     }
   ]
 }
