@@ -226,6 +226,8 @@ jobs:
 
         elif [ "$CONCLUSION" == "failure" -o "$TRIGGER_CONCLUSION" == "failure" ]; then
           MSG=":x: Automated patch release failed. Please [check the logs]($THIS_RUN)."
+        elif [ "$CONCLUSION" == "skipped" ] || [ "$TRIGGER_CONCLUSION" == "skipped" ]; then
+          echo "Will not post notification."
         else
           MSG=":warning: Automated patch release possibly failed! Please [check the logs]($THIS_RUN)."
         fi
