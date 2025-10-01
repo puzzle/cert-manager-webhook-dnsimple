@@ -211,7 +211,17 @@ jobs:
         THIS_RUN=$(gh run --repo ${{ github.repository }} view ${{ github.run_id }} --json jobs --jq '.jobs[] | select(.name == "${{ github.job }}") | .url')
         
         CONCLUSION=$(gh run view ${{ github.run_id }} --json jobs | jq -r '.jobs[] | select(.name == "update") | .conclusion')
-        TRIGGER_CONCLUSION=$(gh run view ${{ github.run_id }} --json jobs | jq -r '.jobs[] | select(.name | startswith("trigger-release")) | .conclusion')
+
+        # Wait up to 120 seconds for trigger-release job to finish
+        for i in {1..12}; do
+          TRIGGER_CONCLUSION=$(gh run view ${{ github.run_id }} --json jobs | jq -r '.jobs[] | select(.name | startswith("trigger-release")) | .conclusion')
+          if [ "$TRIGGER_CONCLUSION" != "null" ]; then
+            break
+          fi
+          echo "Waiting for trigger-release job to finish... (Last status: '$TRIGGER_CONCLUSION')"
+          sleep 10
+        done
+
         echo "Update job conclusion: $CONCLUSION"
         echo "Trigger-release job conclusion: $TRIGGER_CONCLUSION"
         
