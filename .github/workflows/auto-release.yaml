@@ -160,7 +160,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |          
-          echo "Waiting for release workflow to complete..."
+          echo "Waiting for docker workflow to complete..."
           sleep 5
 
           # ID can be derived using 'gh workflow list'
@@ -194,11 +194,13 @@ jobs:
     with:
       release-body-addendum: "Automated release"
 
-  # Only notify on success or failure
+  # Only notify on success or failure.
+  # Non-patch PRs, if present, would have been handled already.
   notify:
     needs:
       - update
       - check
+      - trigger-release
     if: ${{ always() && needs.check.outputs.non_patch_prs != 'true' }}
     runs-on: ubuntu-latest
     steps:
@@ -209,23 +211,14 @@ jobs:
         GH_TOKEN: ${{ github.token }}
       run: |
         THIS_RUN=$(gh run --repo ${{ github.repository }} view ${{ github.run_id }} --json jobs --jq '.jobs[] | select(.name == "${{ github.job }}") | .url')
-        
-        CONCLUSION=$(gh run view ${{ github.run_id }} --json jobs | jq -r '.jobs[] | select(.name == "update") | .conclusion')
 
-        # Wait up to 120 seconds for trigger-release job to finish
-        for i in {1..12}; do
-          TRIGGER_CONCLUSION=$(gh run view ${{ github.run_id }} --json jobs | jq -r '.jobs[] | select(.name | startswith("trigger-release")) | .conclusion')
-          if [ "$TRIGGER_CONCLUSION" != "null" ]; then
-            break
-          fi
-          echo "Waiting for trigger-release job to finish... (Last status: '$TRIGGER_CONCLUSION')"
-          sleep 10
-        done
+        UPDATE_CONCLUSION=${{ needs.update.result }}
+        TRIGGER_CONCLUSION=${{ needs.trigger-release.result }}
 
-        echo "Update job conclusion: $CONCLUSION"
-        echo "Trigger-release job conclusion: $TRIGGER_CONCLUSION"
+        echo "Job 'update' conclusion: $UPDATE_CONCLUSION"
+        echo "Job 'trigger-release' conclusion: $TRIGGER_CONCLUSION"
         
-        if [ "$CONCLUSION" == "success" -a "$TRIGGER_CONCLUSION" == "success" ]; then
+        if [ "$UPDATE_CONCLUSION" == "success" -a "$TRIGGER_CONCLUSION" == "success" ]; then
           MSG=$(cat <<EOF
         :white_check_mark: Automated patch release completed successfully!
         New chart version: ${{ needs.update.outputs.chart }}
@@ -234,9 +227,9 @@ jobs:
         EOF
         )
 
-        elif [ "$CONCLUSION" == "failure" -o "$TRIGGER_CONCLUSION" == "failure" ]; then
+        elif [ "$UPDATE_CONCLUSION" == "failure" -o "$TRIGGER_CONCLUSION" == "failure" ]; then
           MSG=":x: Automated patch release failed. Please [check the logs]($THIS_RUN)."
-        elif [ "$CONCLUSION" == "skipped" ] || [ "$TRIGGER_CONCLUSION" == "skipped" ]; then
+        elif [ "$UPDATE_CONCLUSION" == "skipped" ] || [ "$TRIGGER_CONCLUSION" == "skipped" ]; then
           echo "Will not post notification."
         else
           MSG=":warning: Automated patch release possibly failed! Please [check the logs]($THIS_RUN)."
