@@ -40,6 +40,23 @@ resources: {}
 #  cpu: 100m
 #  memory: 128Mi
 
+readinessProbe:
+  failureThreshold: 3
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
+  initialDelaySeconds: 5
+livenessProbe:
+  failureThreshold: 3
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
+startupProbe:
+  failureThreshold: 10
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
+
 nodeSelector: {}
 tolerations: []
 affinity: {}
