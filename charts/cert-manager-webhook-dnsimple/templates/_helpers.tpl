@@ -52,6 +52,13 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
+Deployment config
+*/}}
+{{- define "dnsimple-webhook.replicas" -}}
+{{- default 1 .Values.replicaCount -}}
+{{- end -}}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "dnsimple-webhook.chart" -}}
