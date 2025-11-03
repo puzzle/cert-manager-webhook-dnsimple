@@ -14,6 +14,26 @@ APIService group name
 {{- end -}}
 
 {{/*
+Service config
+*/}}
+{{- define "dnsimple-webhook.service.port-name" -}}
+{{- default "https" .Values.service.name -}}
+{{- end -}}
+
+{{/*
+Probes config
+*/}}
+{{- define "dnsimple-webhook.probes.scheme" -}}
+{{- printf "%s" "HTTPS" -}}
+{{- end -}}
+{{- define "dnsimple-webhook.probes.path" -}}
+{{- printf "%s" "/healthz" -}}
+{{- end -}}
+{{- define "dnsimple-webhook.probes.port" -}}
+{{- include "dnsimple-webhook.service.port-name" . -}}
+{{- end -}}
+
+{{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.

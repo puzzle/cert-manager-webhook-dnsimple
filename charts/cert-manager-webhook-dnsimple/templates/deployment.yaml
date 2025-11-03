@@ -45,7 +45,7 @@ spec:
             - name: GROUP_NAME
               value: {{ include "dnsimple-webhook.api-group" . | quote }}
           ports:
-            - name: https
+            - name: {{ include "dnsimple-webhook.probes.port" . }}
 {{- if .Values.useUnprivilegedPort }}
               containerPort: 8443
 {{- else }}
@@ -55,27 +55,28 @@ spec:
           livenessProbe:
             failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
             httpGet:
-              scheme: HTTPS
-              path: /healthz
-              port: https
+              scheme: {{ include "dnsimple-webhook.probes.scheme" . }}
+              path: {{ include "dnsimple-webhook.probes.path" . }}
+              port: {{ include "dnsimple-webhook.probes.port" . }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
             successThreshold: {{ .Values.livenessProbe.successThreshold }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
           readinessProbe:
             failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
             httpGet:
-              scheme: HTTPS
-              path: /healthz
-              port: https
+              scheme: {{ include "dnsimple-webhook.probes.scheme" . }}
+              path: {{ include "dnsimple-webhook.probes.path" . }}
+              port: {{ include "dnsimple-webhook.probes.port" . }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
             successThreshold: {{ .Values.readinessProbe.successThreshold }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.startupProbe.periodSeconds }}
           startupProbe:
             failureThreshold: {{ .Values.startupProbe.failureThreshold }}
             httpGet:
-              scheme: HTTPS
-              path: /healthz
-              port: https
+              scheme: {{ include "dnsimple-webhook.probes.scheme" . }}
+              path: {{ include "dnsimple-webhook.probes.path" . }}
+              port: {{ include "dnsimple-webhook.probes.port" . }}
             periodSeconds: {{ .Values.startupProbe.periodSeconds }}
             successThreshold: {{ .Values.startupProbe.successThreshold }}
             timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
