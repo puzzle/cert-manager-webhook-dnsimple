@@ -45,7 +45,7 @@ spec:
             - name: GROUP_NAME
               value: {{ include "dnsimple-webhook.api-group" . | quote }}
           ports:
-            - name: {{ include "dnsimple-webhook.service.port-name" . }}
+            - name: {{ .Values.service.portName }}
 {{- if .Values.useUnprivilegedPort }}
               containerPort: 8443
 {{- else }}
@@ -57,16 +57,17 @@ spec:
             httpGet:
               scheme: {{ include "dnsimple-webhook.probes.scheme" . }}
               path: {{ include "dnsimple-webhook.probes.path" . }}
-              port: {{ include "dnsimple-webhook.service.port-name" . }}
+              port: {{ .Values.service.portName }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
             successThreshold: {{ .Values.livenessProbe.successThreshold }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
           readinessProbe:
             failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
             httpGet:
               scheme: {{ include "dnsimple-webhook.probes.scheme" . }}
               path: {{ include "dnsimple-webhook.probes.path" . }}
-              port: {{ include "dnsimple-webhook.service.port-name" . }}
+              port: {{ .Values.service.portName }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
             successThreshold: {{ .Values.readinessProbe.successThreshold }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
@@ -76,7 +77,7 @@ spec:
             httpGet:
               scheme: {{ include "dnsimple-webhook.probes.scheme" . }}
               path: {{ include "dnsimple-webhook.probes.path" . }}
-              port: {{ include "dnsimple-webhook.service.port-name" . }}
+              port: {{ .Values.service.portName }}
             periodSeconds: {{ .Values.startupProbe.periodSeconds }}
             successThreshold: {{ .Values.startupProbe.successThreshold }}
             timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}

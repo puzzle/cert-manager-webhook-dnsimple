@@ -11,9 +11,9 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: {{ include "dnsimple-webhook.service.port-name" . }}
+      targetPort: {{ .Values.service.portName }}
       protocol: TCP
-      name: {{ include "dnsimple-webhook.service.port-name" . }}
+      name: {{ .Values.service.portName }}
   selector:
     app: {{ include "dnsimple-webhook.name" . }}
     release: {{ .Release.Name }}

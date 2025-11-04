@@ -14,20 +14,13 @@ APIService group name
 {{- end -}}
 
 {{/*
-Service config
-*/}}
-{{- define "dnsimple-webhook.service.port-name" -}}
-{{- default "https" .Values.service.name -}}
-{{- end -}}
-
-{{/*
 Probes config
 */}}
 {{- define "dnsimple-webhook.probes.scheme" -}}
-{{- printf "%s" "HTTPS" -}}
+{{- "HTTPS" -}}
 {{- end -}}
 {{- define "dnsimple-webhook.probes.path" -}}
-{{- printf "%s" "/healthz" -}}
+{{- "/healthz" -}}
 {{- end -}}
 
 {{/*
