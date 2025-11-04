@@ -11,7 +11,7 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: https
+      targetPort: {{ include "dnsimple-webhook.service.port-name" . }}
       protocol: TCP
       name: {{ include "dnsimple-webhook.service.port-name" . }}
   selector:

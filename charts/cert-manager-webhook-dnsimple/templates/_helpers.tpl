@@ -29,9 +29,6 @@ Probes config
 {{- define "dnsimple-webhook.probes.path" -}}
 {{- printf "%s" "/healthz" -}}
 {{- end -}}
-{{- define "dnsimple-webhook.probes.port" -}}
-{{- include "dnsimple-webhook.service.port-name" . -}}
-{{- end -}}
 
 {{/*
 Create a default fully qualified app name.
