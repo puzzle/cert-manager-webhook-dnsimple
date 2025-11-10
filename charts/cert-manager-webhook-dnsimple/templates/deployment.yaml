@@ -45,7 +45,7 @@ spec:
             - name: GROUP_NAME
               value: {{ include "dnsimple-webhook.api-group" . | quote }}
           ports:
-            - name: https
+            - name: {{ .Values.service.portName }}
 {{- if .Values.useUnprivilegedPort }}
               containerPort: 8443
 {{- else }}
@@ -53,15 +53,34 @@ spec:
 {{- end }}
               protocol: TCP
           livenessProbe:
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
             httpGet:
-              scheme: HTTPS
-              path: /healthz
-              port: https
+              scheme: {{ include "dnsimple-webhook.probes.scheme" . }}
+              path: {{ include "dnsimple-webhook.probes.path" . }}
+              port: {{ .Values.service.portName }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
           readinessProbe:
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
             httpGet:
-              scheme: HTTPS
-              path: /healthz
-              port: https
+              scheme: {{ include "dnsimple-webhook.probes.scheme" . }}
+              path: {{ include "dnsimple-webhook.probes.path" . }}
+              port: {{ .Values.service.portName }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          startupProbe:
+            failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+            httpGet:
+              scheme: {{ include "dnsimple-webhook.probes.scheme" . }}
+              path: {{ include "dnsimple-webhook.probes.path" . }}
+              port: {{ .Values.service.portName }}
+            periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+            successThreshold: {{ .Values.startupProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
           volumeMounts:
             - name: certs
               mountPath: /tls

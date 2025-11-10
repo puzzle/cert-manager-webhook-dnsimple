@@ -14,6 +14,16 @@ APIService group name
 {{- end -}}
 
 {{/*
+Probes config
+*/}}
+{{- define "dnsimple-webhook.probes.scheme" -}}
+{{- "HTTPS" -}}
+{{- end -}}
+{{- define "dnsimple-webhook.probes.path" -}}
+{{- "/healthz" -}}
+{{- end -}}
+
+{{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
@@ -29,6 +39,13 @@ If release name contains chart name it will be used as a full name.
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
+{{- end -}}
+
+{{/*
+Deployment config
+*/}}
+{{- define "dnsimple-webhook.replicas" -}}
+{{- default 1 .Values.replicaCount -}}
 {{- end -}}
 
 {{/*
