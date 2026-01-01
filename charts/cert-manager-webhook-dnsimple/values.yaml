@@ -19,7 +19,7 @@ clusterIssuer:
     enabled: false
 image:
   repository: ghcr.io/puzzle/cert-manager-webhook-dnsimple
-  tag: v0.1.9
+  tag: v0.1.10
   pullPolicy: IfNotPresent
   # pullSecret: "gcr"
 nameOverride: ""
@@ -59,7 +59,6 @@ startupProbe:
   periodSeconds: 10
   successThreshold: 1
   timeoutSeconds: 1
-
 nodeSelector: {}
 tolerations: []
 affinity: {}
