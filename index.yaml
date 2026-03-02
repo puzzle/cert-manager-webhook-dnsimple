@@ -3,6 +3,22 @@ entries:
   cert-manager-webhook-dnsimple:
   - apiVersion: v1
     appVersion: v0.1.11
+    created: "2026-03-02T15:05:18.239383559Z"
+    description: cert-manager webhook solver for ACME DNS01 challenge via DNSimple
+    digest: fe73037fe3d6200318bc69608be2db6c4b0968cc56ac87444b7b81ecf481bdf5
+    home: https://github.com/puzzle/cert-manager-webhook-dnsimple
+    maintainers:
+    - email: container@puzzle.ch
+      name: Puzzle ITC
+      url: https://www.puzzle.ch
+    name: cert-manager-webhook-dnsimple
+    sources:
+    - https://github.com/puzzle/cert-manager-webhook-dnsimple
+    urls:
+    - https://github.com/puzzle/cert-manager-webhook-dnsimple/releases/download/cert-manager-webhook-dnsimple-0.1.13/cert-manager-webhook-dnsimple-0.1.13.tgz
+    version: 0.1.13
+  - apiVersion: v1
+    appVersion: v0.1.11
     created: "2026-03-02T12:42:57.942362653Z"
     description: cert-manager webhook solver for ACME DNS01 challenge via DNSimple
     digest: 779ff072bc8cfdbaa7361e484cb78c7d5277542960b0ba337eead93674e9d1a6
@@ -275,4 +291,4 @@ entries:
     urls:
     - https://github.com/neoskop/cert-manager-webhook-dnsimple/releases/download/cert-manager-webhook-dnsimple-0.0.1/cert-manager-webhook-dnsimple-0.0.1.tgz
     version: 0.0.1
-generated: "2026-03-02T12:42:57.942609428Z"
+generated: "2026-03-02T15:05:18.239510366Z"
