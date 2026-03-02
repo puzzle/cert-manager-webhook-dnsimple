@@ -6,6 +6,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: {{ include "dnsimple-webhook.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     app: {{ include "dnsimple-webhook.name" . }}
     chart: {{ include "dnsimple-webhook.chart" . }}
