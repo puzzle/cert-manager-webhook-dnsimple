@@ -22,7 +22,7 @@ jobs:
         cm-version: ["1.18.6", "1.19.4"]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Start minikube
       uses: medyagh/setup-minikube@master
