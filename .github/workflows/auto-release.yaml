@@ -92,7 +92,7 @@ jobs:
       app: ${{ steps.new-versions.outputs.app }}
       tag: ${{ steps.new-versions.outputs.tag }}
     steps:
-      - uses: actions/create-github-app-token@v2
+      - uses: actions/create-github-app-token@v3
         id: app-token
         with:
           app-id: ${{ vars.GH_APP_ID }}
