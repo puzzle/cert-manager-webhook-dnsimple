@@ -106,25 +106,20 @@ jobs:
         """  > certificate.yaml
         kubectl apply -f certificate.yaml
 
-    - name: Assert that the DNS record was created
-      env:
-        DNSIMPLE_ZONE_NAME: ${{ secrets.DNSIMPLE_ZONE_NAME }}
-      timeout-minutes: 10
-      run: |
-        while true; do
-          if nslookup -type=TXT _acme-challenge.gh-action-test.$DNSIMPLE_ZONE_NAME ns1.dnsimple.com; then
-            break
-          fi
-          sleep 30
-        done
-
-    # This step can time out, but it timing out doesn't necessarily mean that the webhook is not working.
-    # Timeouts mainly happen due to the environment of the runner and/or parallelism, thus such occurrences will simply be dismissed as warnings.
     - name: Check the certificate status
       run: |
         max_wait_time_seconds=300
         end=$(( $(date +%s) + $max_wait_time_seconds ))
-        start=$(date +%s) 
+        start=$(date +%s)
+
+        dump_diagnostics() {
+          echo "Challenge details:"
+          kubectl describe challenge || true
+          echo "Recent events:"
+          kubectl get events --sort-by=.lastTimestamp || true
+          echo "Webhook logs:"
+          kubectl -n cert-manager logs deploy/cert-manager-webhook-dnsimple || true
+        }
 
         sleep 5
         while [ $(date +%s) -le $end ]; do
@@ -139,6 +134,7 @@ jobs:
 
           if [ $(echo "$OUT_CRT" | grep -iE "Failed|Denied" | wc -l) -gt 0  ]; then
             echo "::Error title=Certificate resource errored::The certificate ressource has an error"
+            dump_diagnostics
             exit 1
           fi
 
@@ -150,4 +146,6 @@ jobs:
           echo -e "\n[i] New iteration at $(date)"
         done
 
-        echo "::warning title=Certificate timed out::Have timed out waiting for certificate"
+        echo "::error title=Certificate timed out::Have timed out waiting for certificate"
+        dump_diagnostics
+        exit 1
