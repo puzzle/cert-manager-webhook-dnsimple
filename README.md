@@ -66,6 +66,8 @@ The Helm chart accepts the following values:
 | `image.pullPolicy`                 | ✔️       | Image pull policy of the solver                 | `IfNotPresent`                          |
 | `logLevel`                         |          | Set the verbosity of the solver                 | _empty_                                 |
 | `useUnprivilegedPort`              |          | Use an unprivileged container-port for the webhook  | `true`                              |
+| `podSecurityContext`               |          | Pod security context; defaults to UID 65532 with `RuntimeDefault` seccomp | see `values.yaml` |
+| `securityContext`                  |          | Webhook container security context; defaults to no privilege escalation and all capabilities dropped | see `values.yaml` |
 | `groupName`                        | ✔️       | Name of the API group used to register the webhook API service as | `acme.dnsimple.com`                                 |
 | `certManager.namespace`            | ✔️       | The namespace cert-manager was installed to     | `cert-manager`                          |
 | `certManager.serviceAccountName`   | ✔️       | The service account cert-manager runs under     | `cert-manager`                          |
