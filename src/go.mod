@@ -2,7 +2,7 @@ module github.com/puzzle/cert-manager-webhook-dnsimple
 
 go 1.26.0
 
-toolchain go1.27.2
+toolchain go1.27.3
 
 require (
 	github.com/cert-manager/cert-manager v1.21.2
